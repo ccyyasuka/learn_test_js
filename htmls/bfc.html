@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Box Model Comparison</title>
+		<style type="text/css">
+			.top {
+				width: 100px;
+				height: 100px;
+				background: blue;
+				margin-bottom: -30px;
+			}
+			.bottom {
+				width: 100px;
+				height: 100px;
+				background: red;
+				margin-top: -20px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="top"></div>
+		<div class="bottom"></div>
+	</body>
+
+	<!-- 
+        两个相邻的外边距都是正数时，折叠结果是它们两者之间较大的值
+        两个相邻的外边距都是负数时，折叠结果是它们两者之间较小的值（绝对值更大）
+        两个外边距一正一负时，折叠结果是两者的相加的和
+     -->
+</html>

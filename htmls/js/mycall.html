@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>JavaScript Execution Context Demo</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>JavaScript Execution Context Demo</h1>
+		<p>Check the console for output.</p>
+		<script>
+			// var obj = {
+			// 	value: 'vortesnail',
+			// };
+
+			// function fn() {
+			// 	console.log(this.value);
+			// }
+
+			// fn.call(obj);
+			//上面是call实现的功能
+			// 1. call 改变了 this 的指向，指向到 obj 。
+			// 2. fn 函数执行了。
+			// 实现思路就是：
+			// obj.fn = fn;
+			// obj.fn();
+			// delete obj.fn;
+			Function.prototype.myCall = function (context) {
+				// 判断调用对象 myCall是Function的原型对象的属性了，
+				//外部函数调用myCall时，外部函数是function，所以this指向外部函数
+
+				//注意！外部函数调用myCall，context是调用时传入的参数，就是obj
+
+				if (typeof this !== 'function') {
+					throw new Error('Type error');
+				}
+				// 首先获取参数
+				console.log(arguments);
+				let args = [...arguments].slice(1);
+				let result = null;
+				//这种写法用于为变量提供一个默认值
+				// 判断 context 是否传入，如果没有传就设置为 window
+				context = context || window;
+				// 将被调用的方法设置为 context 的属性
+				// this 即为我们要调用的方法
+				// 使用symbol避免和原来存在的属性名重复
+				const fnSymbol = Symbol();
+				context[fnSymbol] = this;
+				// 执行要被调用的方法
+				result = context[fnSymbol](...args);
+				// 删除手动增加的属性方法
+				delete context[fnSymbol];
+				// 将执行结果返回
+				return result;
+			};
+
+			//测试
+			function testFunc(greeting, name) {
+				return `${greeting}, ${name}. This is called from ${this.location}`;
+			}
+
+			const context1 = { location: 'sjz' };
+			console.log(testFunc.myCall(context1, 'Hello', 'Alice')); // 应输出: "Hello, Alice. This is called from Context1"
+		</script>
+	</body>
+</html>

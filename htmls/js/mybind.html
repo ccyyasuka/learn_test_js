@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>JavaScript Execution Context Demo</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>JavaScript Execution Context Demo</h1>
+		<p>Check the console for output.</p>
+		<script>
+			Function.prototype.myBind = function (context) {
+				// 调用 bind 的不是函数，需要抛出异常
+				if (typeof this !== 'function') {
+					throw new Error('Function.prototype.bind - what is trying to be bound is not callable');
+				}
+
+				// this 指向调用者
+				var fn = this;
+				// 实现第2点，因为第1个参数是指定的this,所以只截取第1个之后的参数
+				var args = [...arguments].slice(1);
+
+				// 创建一个空对象
+				var fNOP = function () {};
+
+				// 实现第3点,返回一个函数
+				var fBound = function () {
+					// 实现第4点，获取 bind 返回函数的参数
+					var bindArgs = [...arguments];
+					// 然后同传入参数合并成一个参数数组，并作为 self.apply() 的第二个参数
+					return fn.apply(this instanceof fBound ? this : context, args.concat(bindArgs)); //这里是传入了两个参数 args.concat(bindArgs)是第二个
+					// 注释1
+				};
+
+				// 注释2
+				// 空对象的原型指向绑定函数的原型
+				fNOP.prototype = this.prototype;
+				// 空对象的实例赋值给 fBound.prototype
+				fBound.prototype = new fNOP();
+				return fBound;
+			};
+
+			// 简易写法 之后分析是否正确
+			// Function.prototype.myBind = function (context) {
+			// 	// 判断调用对象是否为函数
+			// 	if (typeof this !== 'function') {
+			// 		throw new Error('Type error');
+			// 	}
+			// 	// 获取参数
+			// 	const args = [...arguments].slice(1);
+			// 	const fn = this;
+			// 	return function Fn() {
+			// 		return fn.apply(
+			// 			this instanceof Fn ? this : context,
+			// 			// 当前的这个 arguments 是指 Fn 的参数
+			// 			args.concat(...arguments)
+			// 		);
+			// 	};
+			// };
+
+			//测试1
+			let value = 2;
+			let foo = {
+				value: 1,
+			};
+			function bar(name, age) {
+				this.habit = 'shopping';
+				console.log(this.value);
+				console.log(name);
+				console.log(age);
+			}
+			bar.prototype.friend = 'kevin';
+
+			let bindFoo = bar.myBind(foo, 'Jack');
+			let obj = new bindFoo(20);
+			// undefined
+			// Jack
+			// 20
+
+			console.log(obj.habit);
+			// shopping
+			console.log(obj.friend);
+			// kevin
+
+			//测试2
+
+			let value1 = 2;
+			let foo1 = {
+				value1: 1,
+			};
+			function bar1(name, age) {
+				return {
+					value1: this.value1,
+					name: name,
+					age: age,
+				};
+			}
+
+			let bindFoo1 = bar1.myBind(foo1, 'Jack', 20); // 返回一个函数
+			console.log(bindFoo1());
+			// {value: 1, name: "Jack", age: 20}
+
+			let bindFoo2 = bar1.myBind(foo1, 'Jack'); // 返回一个函数
+			console.log(bindFoo2(20));
+			// {value: 1, name: "Jack", age: 20}
+		</script>
+	</body>
+</html>

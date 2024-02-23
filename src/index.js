@@ -5,12 +5,16 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import List_func from './list_func';
 import MultiClick from './multiClick';
+import Js_func from './js_func';
+import Prototype from './prototype';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
 	<React.StrictMode>
 		<App />
-		<List_func></List_func>
-		<MultiClick></MultiClick>
+		{/* <List_func></List_func>
+		<MultiClick></MultiClick> */}
+		<Prototype></Prototype>
+		<Js_func></Js_func>
 	</React.StrictMode>
 );
 

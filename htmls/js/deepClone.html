@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>JavaScript Execution Context Demo</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>JavaScript Execution Context Demo</h1>
+		<p>Check the console for output.</p>
+		<script>
+			// array = [1, 3, 5];
+			// for (const key in array) {
+			// 	console.log(key);
+			// 	console.log(array[key]); //	js中的array也有key，就是index
+			// }
+
+			function deepClone(obj) {
+				// 数组或普通对象存在循环引用情况，使用 map 存储对象避免无限递归函数
+				// 函数局部变量，函数执行完毕之后就可以被 GC，无需替换为 WeakMap
+				const map = new Map();
+
+				// 递归这个函数
+				function clone(target) {
+					debugger;
+					if (map.has(target)) return map.get(target);
+					// 获取 target 的具体类型，返回：Number String Object Array RegExp ...
+					const type = Object.prototype.toString.call(target).replace(/\[object (\w+)\]/, '$1');
+					// 使用策略模式，处理每种类型的克隆
+					const strategy = {
+						// Array 和 Object 可以公用一个函数
+						ObjectOrArray() {
+							const result = Array.isArray(target) ? [] : {};
+							// const result = new target.constructor();
+							// ! 在迭代开始前进行 set
+							map.set(target, result);
+							for (const [k, v] of Object.entries(target)) {
+								result[k] = clone(v);
+							}
+							return result;
+						},
+						Map() {
+							const newMap = new Map();
+							target.forEach((v, k) => {
+								newMap.set(clone(k), clone(v));
+							});
+							return newMap;
+						},
+						Set() {
+							const newSet = new Set();
+							target.forEach(item => {
+								newSet.add(clone(item));
+							});
+							return newSet;
+						},
+						Date() {
+							return new Date(target.valueOf());
+						},
+						RegExp() {
+							const newReg = new RegExp(target.source, target.flags);
+							newReg.lastIndex = target.lastIndex;
+							return newReg;
+						},
+						Error() {
+							return new Error(target.message);
+						},
+						// ... 可添加支持更多对象类型
+					};
+					if (['Array', 'Object'].includes(type)) {
+						return strategy.ObjectOrArray();
+					} else {
+						return strategy[type] ? strategy[type]() : target;
+					}
+				}
+
+				return clone(obj);
+			}
+
+			const target = {
+				// field1: 1,
+				// field2: undefined,
+				// field3: 'ConardLi',
+				// field4: {
+				// 	child: 'child',
+				// 	child2: {
+				// 		child2: 'child2',
+				// 	},
+				// },
+				field5: [2, 4, 8],
+			};
+			target.target = target;
+			console.log(deepClone(target));
+		</script>
+	</body>
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<style>
+			.float {
+				/* float: left; */
+				width: 50px;
+				height: 50px;
+				background-color: lightblue;
+				margin: 10px;
+			}
+			.bfc {
+				display: inline-block; /* 创建 BFC 不能避免重叠 inline-block可以 overflow:hidden不行*/
+				/* border: 2px solid black; */
+				width: 200px;
+				height: 50px;
+				margin: 10px;
+				background-color: rgb(247, 249, 187);
+			}
+		</style>
+	</head>
+	<body>
+		<div class="float"></div>
+		<div class="bfc">Content here...</div>
+	</body>
+</html>

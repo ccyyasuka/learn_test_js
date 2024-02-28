@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>JavaScript Execution Context Demo</title>
+		<style></style>
+	</head>
+	<body>
+		<script>
+			// 其内部运行机制是判断在其原型链中能否找到该类型的原型。
+			// 因为null是原型链的头部了，所以null instance of Object是false
+			// 能判断对象类型，不能判断基本数据类型
+			function myInstanceof(target, origin) {
+				if (typeof target !== 'object' || target === null) return false;
+				if (typeof origin !== 'function') throw new TypeError('origin must be function');
+				let proto = Object.getPrototypeOf(target); // 相当于 proto = target.__proto__;
+				while (proto) {
+					if (proto === origin.prototype) return true;
+					proto = Object.getPrototypeOf(proto); //从对象出发，沿着__proto__一路往上找，找到函数的prototype为止
+				}
+				return false;
+			}
+			console.log(null instanceof Object); //false
+			class MyClass {}
+
+			const instance = new MyClass();
+			console.log(myInstanceof(instance, MyClass)); // 应该输出 true
+			console.log(myInstanceof(instance, Object));
+			// 应该输出 true，因为 MyClass 的原型链上有 Object
+			console.log(myInstanceof({}, Object)); // 应该输出 true，因为普通对象直接继承自 Object
+			console.log(myInstanceof({}, MyClass)); // 应该输出 false，普通对象不是 MyClass 的实例
+		</script>
+	</body>
+</html>

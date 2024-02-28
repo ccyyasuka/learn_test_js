@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="x-ua-compatible" content="IE=edge, chrome=1" />
+		<title>debounce</title>
+		<style>
+			#container {
+				width: 100%;
+				height: 200px;
+				line-height: 200px;
+				text-align: center;
+				color: #fff;
+				background-color: #444;
+				font-size: 30px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<!-- 处理频繁的事件触发，会出现卡顿 -->
+		<div id="container"></div>
+		<button id="button">取消debounce</button>
+		<script>
+			// immediate对应需求是，不希望等到事件停止触发后才执行，
+			// 我希望立刻执行函数，然后等到停止触发 n 秒后，才可以重新触发执行。
+			function debounce(func, wait, immediate) {
+				var timeout, result;
+				// debounce 函数确保无论事件触发多么频繁，
+				// func 函数只在最后一次事件触发后的 wait 毫秒内执行一次。
+				var debounced = function () {
+					// debugger;
+					var args = arguments;
+					var context = this;
+					// 如果在超时时间内发生了某个事件，想要取消执行之前设置的方法，
+					// 可以使用 clearTimeout 清理掉之前设置的 timeout 对象。
+					if (timeout) clearTimeout(timeout);
+					// setTimeout 函数创建一个新的定时器，定时器延迟 wait 毫秒执行匿名函数function，
+					// 也就是执行 func 函数，因为使用了apply
+					// setTimeout 的返回值（定时器标识）赋给之前声明的 timeout 变量，
+					// 以便在下一次事件触发时可以通过 clearTimeout 清除定时器。
+					if (immediate) {
+						// 如果已经执行过，一定经过timeout = setTimeout，timeout就是true, 不再执行
+						var callNow = !timeout;
+						//设置一个定时器，wait后把timeout清空，可以重新触发
+						timeout = setTimeout(function () {
+							timeout = null;
+						}, wait);
+						if (callNow) result = func.apply(context, args);
+					} else {
+						timeout = setTimeout(function () {
+							func.apply(context, args);
+						}, wait); //经过wait后执行
+					}
+					return result;
+				};
+				// 比如说我 debounce 的时间间隔是 10 秒钟，immediate 为 true，这样的话，
+				// 我只有等 10 秒后才能重新触发事件，现在我希望有一个按钮，点击后，取消防抖，这样我再去触发
+				// ，就可以又立刻执行啦
+				debounced.cancel = function () {
+					clearTimeout(timeout);
+					timeout = null;
+				};
+
+				return debounced;
+			}
+			var count = 1;
+			var container = document.getElementById('container');
+
+			function getUserAction(e) {
+				//不使用debounce，那么this指向container
+				// 使用debounce又不修改this指向，this就指向window
+				// onmousemove时，调用debounce返回的匿名函数，匿名函数中使用setTimeout来延迟调用
+				//getUserAction。由于setTimeout是在全局作用域下调用的，
+				//所以在setTimeout内部调用的func（即getUserAction）时，this关键字默认指向全局对象，
+				//在浏览器环境中是window。
+				console.log(this);
+				// 事件处理函数中会提供事件对象 event
+				console.log(e);
+				container.innerHTML = count++;
+				// return 10;
+			}
+
+			// container.onmousemove = getUserAction;
+			var setUseAction = debounce(getUserAction, 1000, true);
+			container.onmousemove = setUseAction;
+			document.getElementById('button').addEventListener('click', function () {
+				setUseAction.cancel();
+			});
+		</script>
+	</body>
+</html>

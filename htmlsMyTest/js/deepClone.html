@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>JavaScript Execution Context Demo</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>JavaScript Execution Context Demo</h1>
+		<p>Check the console for output.</p>
+		<script>
+			function deepClone(target) {
+				let myMap = new Map();
+				function clone(target) {
+					if (myMap.get(target)) return myMap.target;
+
+					let strategy = {
+						ObjectOrArray() {
+							let result = new target.constructor();
+							myMap.set(target, target);
+							for (const [k, v] of Object.entries(target)) result[k] = clone(v);
+							return result;
+						},
+						Map() {
+							let result = new Map();
+							myMap.set(target, target);
+							target.forEach((v, k) => {
+								result.set(clone(k), clone(v));
+							});
+							return result;
+						},
+						Set() {
+							let result = new Set();
+							myMap.set(target, target);
+							target.forEach(v => {
+								result.add(clone(v));
+							});
+							return result;
+						},
+						Date() {
+							return new Date(target.valueOf());
+						},
+						Error() {
+							return new Error(target.message);
+						},
+					};
+					let type = Object.prototype.toString.call(target);
+					type = type.substring(8, type.length - 1);
+					if (['Object', 'Array'].includes(type)) return strategy.ObjectOrArray();
+					else return strategy[type] ? strategy[type]() : target;
+				}
+
+				return clone(target);
+			}
+			let map1 = new Map();
+			let set1 = new Set();
+			map1.set('a', 1);
+			map1.set('b', 2);
+			set1.add(2);
+			const target = {
+				field1: 1,
+				field2: undefined,
+				field3: {
+					child: 'child',
+				},
+				field4: [2, 4, 8],
+				empty: null,
+				map1,
+				set1,
+			};
+			target.target = target;
+			console.log(deepClone(target));
+		</script>
+	</body>
+</html>

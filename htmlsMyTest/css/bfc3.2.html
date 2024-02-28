@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<style>
+			.container {
+				overflow: hidden; /* 创建新的 BFC */
+				width: 200px;
+				border: 2px solid black;
+			}
+			.box {
+				background-color: lightblue;
+				margin: 10px;
+				overflow: hidden; /* 每个 box 创建自己的 BFC */
+				/* 或者使用 display: flow-root; */
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<div class="box">Box 1</div>
+			<div class="box">Box 2</div>
+		</div>
+	</body>
+</html>

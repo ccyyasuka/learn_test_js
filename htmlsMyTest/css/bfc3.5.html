@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<style>
+			.container {
+				overflow: hidden; /* 独立的 BFC */
+				border: 2px solid black;
+				width: 200px;
+			}
+			.outside {
+				margin-top: 20px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<p>Inside BFC</p>
+		</div>
+		<div class="outside">
+			<p>Outside BFC</p>
+		</div>
+	</body>
+</html>

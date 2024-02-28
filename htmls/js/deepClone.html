@@ -27,7 +27,7 @@
 
 				// 递归这个函数
 				function clone(target) {
-					debugger;
+					// debugger;
 					if (map.has(target)) return map.get(target);
 					// 获取 target 的具体类型，返回：Number String Object Array RegExp ...
 					const type = Object.prototype.toString.call(target).replace(/\[object (\w+)\]/, '$1');
@@ -35,10 +35,13 @@
 					const strategy = {
 						// Array 和 Object 可以公用一个函数
 						ObjectOrArray() {
-							const result = Array.isArray(target) ? [] : {};
-							// const result = new target.constructor();
+							// const result = Array.isArray(target) ? [] : {};
+							// 使用原对象的构造方法，可以保留对象原型__proto__上的数据，
+							// 如果直接使用普通的{}，那么原型必然是丢失了的。
+							const result = new target.constructor();
 							// ! 在迭代开始前进行 set
 							map.set(target, result);
+							// Object.entries()返回一个数组，其元素是object上的属性键值对相对应的数组
 							for (const [k, v] of Object.entries(target)) {
 								result[k] = clone(v);
 							}
@@ -81,17 +84,21 @@
 				return clone(obj);
 			}
 
+			let map1 = new Map();
+			let set1 = new Set();
+			map1.set('a', 1);
+			map1.set('b', 2);
+			set1.add(2);
 			const target = {
-				// field1: 1,
-				// field2: undefined,
-				// field3: 'ConardLi',
-				// field4: {
-				// 	child: 'child',
-				// 	child2: {
-				// 		child2: 'child2',
-				// 	},
-				// },
-				field5: [2, 4, 8],
+				field1: 1,
+				field2: undefined,
+				field3: {
+					child: 'child',
+				},
+				field4: [2, 4, 8],
+				empty: null,
+				map1,
+				set1,
 			};
 			target.target = target;
 			console.log(deepClone(target));

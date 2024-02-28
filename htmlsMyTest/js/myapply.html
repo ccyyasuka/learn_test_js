@@ -16,34 +16,22 @@
 		<script>
 			Function.prototype.myApply = function (context) {
 				if (typeof this !== 'function') {
-					throw new Error('Type error');
+					throw new Error('type error');
 				}
 				let args;
 				if (arguments[1]) {
 					args = arguments[1];
-					//拿到外部列表形式的参数
-				} else {
-					args = null;
 				}
-
-				// let args = [...arguments].slice(1);
-				let result = null;
-				context = context || window;
-				// 与上面代码相比，我们使用 Symbol 来保证属性唯一
-				// 也就是保证不会重写用户自己原来定义在 context 中的同名属性
-				const fnSymbol = Symbol();
+				let fnSymbol = Symbol();
 				context[fnSymbol] = this;
-				// 执行要被调用的方法
+				let res;
 				if (arguments[1]) {
-					// console.log(...arguments[1]);
-					//此处先执行arguments[1] 再执行... 所以是把外边传入的列表解包
-					result = context[fnSymbol](...args);
+					res = context[fnSymbol](...args);
 				} else {
-					result = context[fnSymbol]();
+					res = context[fnSymbol]();
 				}
-				delete context[fnSymbol];
-				// 这个函数的终极目的是得到外部函数执行后的结果
-				return result;
+				delete context[fnSymbol]; //记得删除
+				return res;
 			};
 			//测试
 			function testFunc(greeting, name) {

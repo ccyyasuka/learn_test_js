@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="x-ua-compatible" content="IE=edge, chrome=1" />
+		<title>debounce</title>
+		<style>
+			#container {
+				width: 100%;
+				height: 200px;
+				line-height: 200px;
+				text-align: center;
+				color: #fff;
+				background-color: #444;
+				font-size: 30px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<!-- 处理频繁的事件触发，会出现卡顿 -->
+		<div id="container"></div>
+		<button id="button">取消debounce</button>
+		<script>
+			// var setUseAction = debounce(getUserAction, 1000, true);
+			// // container.onmousemove = setUseAction;
+			// container.onmousemove = function (e) {
+			// 	var result = setUseAction(e);
+			// 	console.log('Action Count: ' + result);
+			// };
+			// document.getElementById('button').addEventListener('click', function () {
+			// 	setUseAction.cancel();
+			// });
+			function debounce(func, wait, immediate) {
+				let timeout, result;
+				let debounced = function () {
+					let args = arguments; //取参数
+					let context = this; //取绑定这个函数的dom
+					if (timeout) {
+						clearTimeout(timeout); //计时过程中又遇到了事件，就删掉原来事件的计时
+					}
+					if (immediate) {
+						let callNow = !timeout; //执行过，timeout就为true，callNow为false，就不立即执行
+						timeout = setTimeout(function () {
+							timeout = null;
+						}, wait); //wait后把timeout重置为null，并立刻生成当前timeout
+						if (callNow) result = func.apply(context, args);
+					} else {
+						setTimeout(function () {
+							func.apply(context, args);
+						}, wait);
+					}
+					return result;
+				};
+				debounced.cancel = function () {
+					clearTimeout(timeout);
+					timeout = null;
+				};
+				return debounced;
+			}
+
+			var count = 1;
+			var container = document.getElementById('container');
+
+			function getUserAction(e) {
+				//不使用debounce，那么this指向container
+				// 使用debounce又不修改this指向，this就指向window
+				// onmousemove时，调用debounce返回的匿名函数，匿名函数中使用setTimeout来延迟调用getUserAction。
+				// 由于setTimeout是在全局作用域下调用的，
+				//所以在setTimeout内部调用的func（即getUserAction）时，this关键字默认指向全局对象，
+				//在浏览器环境中是window。
+				console.log(this);
+				// 事件处理函数中会提供事件对象 event
+				console.log(e);
+				container.innerHTML = ++count;
+				return count;
+				// return 10;
+			}
+
+			// container.onmousemove = getUserAction;
+			var setUseAction = debounce(getUserAction, 1000, true);
+			// container.onmousemove = setUseAction;
+			container.onmousemove = function (e) {
+				var result = setUseAction(e);
+				console.log('Action Count: ' + result);
+			};
+			document.getElementById('button').addEventListener('click', function () {
+				setUseAction.cancel();
+			});
+		</script>
+	</body>
+</html>

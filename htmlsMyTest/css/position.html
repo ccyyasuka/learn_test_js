@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>CSS Position Demo</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+			}
+			.container {
+				width: 200px;
+				height: 200px;
+				position: relative; /* 作为后代绝对定位的参照 */
+				background-color: rgb(6, 1, 1);
+			}
+			.static {
+				position: static;
+				/* 默认值，元素按常规流排列。top、right、bottom、left 和 z-index 属性不会影响此元素 */
+				background-color: red;
+			}
+			.relative {
+				position: relative;
+				/* 相对于其正常位置进行定位,元素首先按static定位布局，
+                然后根据top, right, bottom, left进行偏移。 */
+				top: 20px;
+				left: 20px;
+				background-color: green;
+			}
+			.absolute {
+				position: absolute; /* 元素从常规流中脱离, 相对于最近的已定位（非static）祖先元素定位, 用于自由的定位。文字设置为relative，行内小图设置为文字的字元素，再设置为absolute，就可以让行内小图跟随文档流又可以自由定位*/
+				top: 40px;
+				left: 40px;
+				background-color: blue;
+			}
+			.fixed {
+				position: fixed; /* 相对于浏览器窗口定位，元素从常规流中脱离，并相对于浏览器窗口定位。 */
+				bottom: 20px;
+				right: 20px;
+				background-color: rgb(144, 144, 9);
+			}
+			.sticky {
+				position: sticky; /* 在用户滚动页面时切换为固定定位，元素根据用户的滚动位置在relative与fixed定位之间切换。 */
+				top: 0px;
+				background-color: pink;
+				/* margin: 60px; 这样设置没用 它设置的是其他元素的相邻位置，不能让sticky在container上方有60的空白*/
+			}
+			.box {
+				width: 100px;
+				height: 100px;
+				color: white;
+				padding: 10px;
+				margin: 10px;
+			}
+		</style>
+	</head>
+	<body>
+		<div style="height: 500px; margin: 90px 0px 0px 0px">
+			<!-- top:90px不会在上方产生90的空白 -->
+			<div class="box sticky">Sticky</div>
+		</div>
+		<div class="container">
+			<div class="box static">Static</div>
+		</div>
+
+		<div class="container">
+			<div class="box relative">Relative</div>
+		</div>
+
+		<div class="container">
+			<div class="box absolute">Absolute</div>
+		</div>
+
+		<div class="box fixed">Fixed</div>
+	</body>
+</html>

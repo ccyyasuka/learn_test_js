@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>JavaScript Execution Context Demo</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>JavaScript Execution Context Demo</h1>
+		<p>Check the console for output.</p>
+		<script>
+			function myNew(context) {
+				let obj = new Object();
+				obj.__proto__ = context.prototype; //没有括号
+				let args = [...arguments].slice(1);
+				let res = context.apply(obj, args);
+				return typeof res === 'object' ? res : obj;
+			}
+			function Person(name, age) {
+				this.name = name;
+				this.age = age;
+			}
+
+			Person.prototype.introduce = function () {
+				console.log(`My name is ${this.name} and I am ${this.age} years old.`);
+			};
+			const person2 = myNew(Person, 'Bob', 25);
+			person2.introduce();
+
+			// 构造函数有显式返回一个对象;
+			var Vehicle = function (money) {
+				this.price = money;
+				return { price: 2000 };
+			};
+			Vehicle.prototype.introduce = function () {
+				console.log(`My name is Vehicle and I am ${this.price} dollars.`);
+			};
+			const v1 = myNew(Vehicle, 200);
+			console.log(v1);
+		</script>
+	</body>
+</html>

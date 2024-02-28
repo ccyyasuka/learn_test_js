@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<style>
+			.rectangle {
+				width: 300px;
+				height: 300px;
+				border: 1px solid black;
+				background-color: blue;
+				float: left;
+			}
+			.aaa {
+				overflow: hidden;
+				float: left;
+			}
+		</style>
+	</head>
+	<body>
+		<!-- 如果没有aaa类，因为rectangle设置了float属性，脱离了文件流，所以container这个div高度会以p为准，不会考虑正方形的高度。aaa类让container这个div变成bfc类型的盒子，这样container下面的元素变成了一个整体，从而高度变成了正方形的高度。
+		 -->
+		<div class="container aaa">
+			<div class="rectangle"></div>
+			<p class="aaa">这是一段文字</p>
+			<!-- 如果没有aaa，那么文字的宽度就会和正方形的区域相重叠，有了aaa可以让宽度不影响其他元素，于是就不会重叠了 -->
+		</div>
+	</body>
+</html>
+<!-- 
+	bfc一句话介绍：⼀块独⽴的渲染区域，内部元素的渲染不会影响边界以外的元素
+ -->
+<!-- 
+	1. 块级元素会在垂直方向一个接一个的排列，和文档流的排列方式一致。
+    2. 在 BFC 中上下相邻的两个容器的 margin  会重叠，创建新的 BFC 可以避免外边距重叠。
+    3. 计算 BFC 的高度时，需要计算浮动元素的高度。
+    4. BFC 区域不会与浮动的容器发生重叠。 见双栏布局方法2
+    5. BFC 是独立的容器，容器内部元素不会影响外部元素。
+    6. 每个元素的左 margin  值和容器的左 border  相接触。
+
+	https://juejin.cn/post/6960866014384881671#heading-18
+  -->
+<!-- 形成bfc的条件
+		float 不设置成 none
+		position 是 absolute 或者 fixed
+		overflow 不是 visible
+		display 是 flex 或者 inline-block 等
+	 -->

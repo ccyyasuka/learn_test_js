@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>JavaScript Execution Context Demo</title>
+		<style></style>
+	</head>
+	<body>
+		<script>
+			function myInstanceof(target, origin) {
+				if (typeof target !== 'object' || target === null) return false;
+				if (typeof origin !== 'function') throw new Error('not a function');
+				let proto = Object.getPrototypeOf(target);
+				while (proto) {
+					if (proto === origin.prototype) return true;
+					proto = Object.getPrototypeOf(proto);
+				}
+				return false;
+			}
+			class MyClass {}
+
+			const instance = new MyClass();
+			console.log(myInstanceof(instance, MyClass)); // 应该输出 true
+			console.log(myInstanceof(instance, Object));
+			// 应该输出 true，因为 MyClass 的原型链上有 Object
+			console.log(myInstanceof({}, Object)); // 应该输出 true，因为普通对象直接继承自 Object
+			console.log(myInstanceof({}, MyClass)); // 应该输出 false，普通对象不是 MyClass 的实例
+		</script>
+	</body>
+</html>

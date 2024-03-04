@@ -46,7 +46,7 @@
 						timeout = setTimeout(function () {
 							timeout = null;
 						}, wait);
-						if (callNow) result = func.apply(context, args);
+						if (callNow) result = func.apply(context, args); //不能if (！timeout)因为已经新设置了timeout
 					} else {
 						timeout = setTimeout(function () {
 							func.apply(context, args);

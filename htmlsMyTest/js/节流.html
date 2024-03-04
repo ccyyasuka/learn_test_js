@@ -23,41 +23,34 @@
 		<button id="button">取消debounce</button>
 		<script>
 			function throttle(func, wait) {
-				let timeout, context, args, result;
+				let args, context, result, timeout;
 				let previous = 0;
-				let final = function () {
-					previous = +new Date();
-					timeout = null; //这两步是重置
-					func.apply(context, args);
-					console.log('ddd');
-				};
+				let finalDo = function () {
+					timeout = null;
 
+					previous = Date.now();
+					func.apply(context, args);
+				};
 				let throttled = function () {
 					args = arguments;
 					context = this;
-					let current = +new Date();
-					let remain = wait - (current - previous);
-					if (remain <= 0 || remain > wait) {
-						console.log('aaa', remain); //滑动第一次，进入这里，执行函数
+					let now = Date.now();
+					let remain = wait - (now - previous);
+					if (remain <= 0) {
 						if (timeout) {
-							//很奇怪，偶尔会跳入这里，这是保底用的，跳入这里的时候取消定时器，重新计时
-							console.log('ccc');
-							clearTimeout(timeout); //让定时器失效
+							clearTimeout(timeout);
 							timeout = null;
 						}
 						func.apply(context, args);
-						previous = current;
+						previous = Date.now();
 					} else if (!timeout) {
-						//滑动第三次到第n次，在这里被timeout判断拦下来，直到setTimeout执行完
-						//滑动第二次，等滑动第一次的函数执行结束后，timeout仍为null，而且remain>0，
-						//即没到wait终点的时候,进入这里，设置了remain后的定时器
-						timeout = setTimeout(final, remain);
-						console.log('bbb', remain);
+						timeout = setTimeout(finalDo, remain);
 					}
 				};
 				return throttled;
 			}
 			//在短时间内鼠标滑动了若干次
+
 			var count = 1;
 			var container = document.getElementById('container');
 			function getUserAction(e) {
@@ -65,6 +58,7 @@
 				// console.log(e);
 				container.innerHTML = ++count;
 			}
+
 			container.onmousemove = throttle(getUserAction, 3000);
 		</script>
 	</body>

@@ -24,13 +24,10 @@
 				// 数组或普通对象存在循环引用情况，使用 map 存储对象避免无限递归函数
 				// 函数局部变量，函数执行完毕之后就可以被 GC，无需替换为 WeakMap
 				const map = new Map();
-
 				// 递归这个函数
 				function clone(target) {
 					// debugger;
 					if (map.has(target)) return map.get(target);
-					// 获取 target 的具体类型，返回：Number String Object Array RegExp ...
-					const type = Object.prototype.toString.call(target).replace(/\[object (\w+)\]/, '$1');
 					// 使用策略模式，处理每种类型的克隆
 					const strategy = {
 						// Array 和 Object 可以公用一个函数
@@ -39,7 +36,6 @@
 							// 使用原对象的构造方法，可以保留对象原型__proto__上的数据，
 							// 如果直接使用普通的{}，那么原型必然是丢失了的。
 							const result = new target.constructor();
-							// ! 在迭代开始前进行 set
 							map.set(target, result);
 							// Object.entries()返回一个数组，其元素是object上的属性键值对相对应的数组
 							for (const [k, v] of Object.entries(target)) {
@@ -74,13 +70,14 @@
 						},
 						// ... 可添加支持更多对象类型
 					};
+					let type = Object.prototype.toString.call(target);
+					type = type.substring(8, type.length - 1);
 					if (['Array', 'Object'].includes(type)) {
 						return strategy.ObjectOrArray();
 					} else {
 						return strategy[type] ? strategy[type]() : target;
 					}
 				}
-
 				return clone(obj);
 			}
 

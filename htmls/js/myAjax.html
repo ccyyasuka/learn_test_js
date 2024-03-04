@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="x-ua-compatible" content="IE=edge, chrome=1" />
+		<style></style>
+	</head>
+
+	<body>
+		<!-- 处理频繁的事件触发，会出现卡顿 -->
+
+		<script>
+			function ajax(url) {
+				const xhr = new XMLHttpRequest();
+				xhr.open('get', url, false);
+				xhr.onreadystatechange = function () {
+					// 异步回调函数
+					if (xhr.readyState === 4) {
+						if (xhr.status == 200) {
+							// 处理响应数据
+							console.log(xhr.responseText);
+						} else {
+							// 处理请求失败
+							console.error('Request failed with status: ' + xhr.status);
+						}
+					}
+				};
+				xhr.send();
+			}
+			ajax('https://www.baidu.com/');
+			function test() {
+				console.log('start');
+
+				setTimeout(() => {
+					console.log('children2');
+					Promise.resolve().then(() => {
+						console.log('children2-1');
+					});
+				}, 0);
+
+				setTimeout(() => {
+					console.log('children3');
+					Promise.resolve().then(() => {
+						console.log('children3-1');
+					});
+				}, 0);
+
+				Promise.resolve().then(() => {
+					console.log('children1');
+				});
+
+				console.log('end');
+			}
+		</script>
+	</body>
+</html>

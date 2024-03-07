@@ -8,12 +8,14 @@
 	</head>
 	<body>
 		<script>
-			function myInstanceof(target, origin) {
-				if (typeof target !== 'object' || target === null) return false;
-				if (typeof origin !== 'function') throw new Error('not a function');
-				let proto = Object.getPrototypeOf(target);
+			function myInstanceof(instance, cla) {
+				if (typeof instance !== 'object' || instance === null) return false;
+				if (typeof cla !== 'function') {
+					throw new Error('not a function');
+				}
+				proto = Object.getPrototypeOf(instance);
 				while (proto) {
-					if (proto === origin.prototype) return true;
+					if (proto === cla.prototype) return true;
 					proto = Object.getPrototypeOf(proto);
 				}
 				return false;

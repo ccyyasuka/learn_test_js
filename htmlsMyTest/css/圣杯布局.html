@@ -6,46 +6,43 @@
 		<title>Box Model Comparison</title>
 		<style type="text/css">
 			#container {
+				height: 200px;
 				padding-left: 200px;
 				padding-right: 150px;
-				height: 200px;
 				position: relative;
-				text-align: center;
 			}
 			#container div {
 				float: left;
-				position: relative;
 			}
-			.center {
-				width: 100%;
+			#center {
 				height: 100%;
-				background-color: lightcoral;
+				background-color: blanchedalmond;
+				width: 100%;
 			}
-			.left {
-				width: 200px;
+			#left {
+				margin-left: -100%;
+				position: relative;
 				left: -200px;
 				height: 100%;
-				/* 不设置left的正常情况下，左边块会从container的初始位置摆放，-200px可以把左边块左移200放在padding位置 */
-				margin-left: -100%;
-				/* margin-left: -200px; 测试用 */
-				background-color: lightcyan;
+				width: 200px;
+				background-color: cadetblue;
 			}
-			.right {
+			#right {
+				background-color: coral;
 				width: 150px;
-				margin-left: -150px;
 				height: 100%;
+				margin-left: -150px;
 				left: 150px;
-				background-color: rgb(139, 224, 139);
+				position: relative;
 			}
 		</style>
 	</head>
 
 	<body>
 		<div id="container">
-			<div class="center">我是中间</div>
-			<!-- 切记center放在第一个div -->
-			<div class="left">我是左边</div>
-			<div class="right">我是右边</div>
+			<div id="center">center</div>
+			<div id="left">left</div>
+			<div id="right">right</div>
 		</div>
 	</body>
 </html>

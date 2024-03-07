@@ -46,7 +46,7 @@
 							timeout = null;
 						}
 						func.apply(context, args);
-						previous = current;
+						previous = current; //这里不能加let 否则会覆盖外部的变量
 					} else if (!timeout) {
 						//滑动第三次到第n次，在这里被timeout判断拦下来，直到setTimeout执行完
 						//滑动第二次，等滑动第一次的函数执行结束后，timeout仍为null，而且remain>0，

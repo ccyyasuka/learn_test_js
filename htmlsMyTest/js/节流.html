@@ -23,32 +23,34 @@
 		<button id="button">取消debounce</button>
 		<script>
 			function throttle(func, wait) {
-				let args, context, result, timeout;
+				let context, res, timeout, args;
 				let previous = 0;
-				let finalDo = function () {
+				let now = null;
+				function final() {
+					// clearTimeout(timeout);
 					timeout = null;
-
 					previous = Date.now();
 					func.apply(context, args);
-				};
+				}
 				let throttled = function () {
 					args = arguments;
 					context = this;
-					let now = Date.now();
-					let remain = wait - (now - previous);
-					if (remain <= 0) {
+					now = Date.now();
+					remain = wait - (now - previous);
+					if (remain <= 0 || remain > wait) {
 						if (timeout) {
 							clearTimeout(timeout);
 							timeout = null;
 						}
-						func.apply(context, args);
+						res = func.apply(context, args);
 						previous = Date.now();
 					} else if (!timeout) {
-						timeout = setTimeout(finalDo, remain);
+						timeout = setTimeout(final, remain);
 					}
 				};
 				return throttled;
 			}
+
 			//在短时间内鼠标滑动了若干次
 
 			var count = 1;

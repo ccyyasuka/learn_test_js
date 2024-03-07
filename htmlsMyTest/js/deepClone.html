@@ -16,44 +16,49 @@
 		<script>
 			function deepClone(target) {
 				let myMap = new Map();
-				function clone(target) {
-					if (myMap.get(target)) return myMap.target;
-					let strategy = {
+				function clone(obj) {
+					if (myMap.has(obj)) {
+						return myMap.get(obj);
+					}
+					strategy = {
 						ObjectOrArray() {
-							let result = new target.constructor();
-							myMap.set(target, target);
-							for (const [k, v] of Object.entries(target)) result[k] = clone(v);
-							return result;
+							let res = new obj.constructor();
+							myMap.set(obj, res);
+							for (let [k, v] of Object.entries(obj)) {
+								res[k] = clone(v);
+							}
+							return res;
 						},
 						Map() {
-							let result = new Map();
-							myMap.set(target, target);
-							target.forEach((v, k) => {
-								result.set(clone(k), clone(v));
+							let res = new Map();
+							obj.forEach((v, k) => {
+								res.set(clone(k), clone(v));
 							});
-							return result;
+							return res;
 						},
 						Set() {
-							let result = new Set();
-							myMap.set(target, target);
-							target.forEach(v => {
-								result.add(clone(v));
+							let res = new Set();
+							obj.forEach(v => {
+								res.add(clone(v));
 							});
-							return result;
+							return res;
 						},
 						Date() {
-							return new Date(target.valueOf());
+							return new Date(obj.valueOf());
 						},
 						Error() {
-							return new Error(target.message);
+							return new Error(obj.message);
 						},
 					};
-					let type = Object.prototype.toString.call(target);
+					let type = Object.prototype.toString.call(obj);
 					type = type.substring(8, type.length - 1);
-					if (['Object', 'Array'].includes(type)) return strategy.ObjectOrArray();
-					else return strategy[type] ? strategy[type]() : target;
+					// console.log(type);
+					if (['Array', 'Object'].includes(type)) {
+						return strategy.ObjectOrArray();
+					} else {
+						return strategy[type] ? strategy[type]() : obj;
+					}
 				}
-
 				return clone(target);
 			}
 			let map1 = new Map();

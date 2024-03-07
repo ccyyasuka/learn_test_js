@@ -14,26 +14,23 @@
 		<h1>JavaScript Execution Context Demo</h1>
 		<p>Check the console for output.</p>
 		<script>
+			//测试
 			Function.prototype.myApply = function (context) {
-				if (typeof this !== 'function') {
-					throw new Error('type error');
-				}
-				let args;
+				if (typeof this !== 'function') throw new Error('not a function');
+				let args = null;
+				let res = null;
+				let funcSym = Symbol();
+				context[funcSym] = this;
 				if (arguments[1]) {
 					args = arguments[1];
-				}
-				let fnSymbol = Symbol();
-				context[fnSymbol] = this;
-				let res;
-				if (arguments[1]) {
-					res = context[fnSymbol](...args);
+					res = context[funcSym](...args); //注意传到函数中时要解包
 				} else {
-					res = context[fnSymbol]();
+					res = context[funcSym]();
 				}
-				delete context[fnSymbol]; //记得删除
+				delete context[funcSym];
 				return res;
 			};
-			//测试
+
 			function testFunc(greeting, name) {
 				return `${greeting}, ${name}. This is applied from ${this.location}`;
 			}

@@ -37,7 +37,7 @@
 				if (arguments[1]) {
 					// console.log(...arguments[1]);
 					//此处先执行arguments[1] 再执行... 所以是把外边传入的列表解包
-					result = context[fnSymbol](...args);
+					result = context[fnSymbol](...args); //注意传到函数中时要解包
 				} else {
 					result = context[fnSymbol]();
 				}

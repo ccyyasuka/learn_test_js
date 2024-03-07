@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="x-ua-compatible" content="IE=edge, chrome=1" />
+		<style></style>
+	</head>
+
+	<body>
+		<script>
+			function flat(arr, depth = 1) {
+				if (depth > 0) {
+					// 以下代码还可以简化，不过为了可读性，还是....
+					return arr.reduce((pre, cur) => {
+						debugger;
+						if (Array.isArray(cur)) {
+							return pre.concat(flat(cur, depth - 1));
+						} else {
+							return pre.concat(cur);
+						}
+						// return pre.concat(Array.isArray(cur) ? flat(cur, depth - 1) : cur);
+					}, []);
+				}
+				return arr.slice(); //当前数组的浅拷贝 因为不想改变原始数组
+			}
+			let test_array = [1, [2, 3, 4]];
+
+			// let test_array = [1, [2, [3, [4, 5], 6], 7], 8, [9, [10]]];
+			console.log(flat(test_array, 3));
+		</script>
+	</body>
+</html>

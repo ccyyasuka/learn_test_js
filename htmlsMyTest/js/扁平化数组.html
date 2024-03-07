@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="x-ua-compatible" content="IE=edge, chrome=1" />
+		<style></style>
+	</head>
+
+	<body>
+		<script>
+			function flat(arr, num) {
+				if (num > 0) {
+					let res = arr.reduce((res, cur) => {
+						if (Array.isArray(cur)) {
+							return res.concat(flat(cur, num - 1));
+						} else {
+							return res.concat(cur);
+						}
+					}, []);
+					return res;
+				}
+				return [...arr];
+			}
+			// let test_array = [1, [2, 3, 4]];
+
+			let test_array = [1, [2, [3, [4, 5], 6], 7], 8, [9, [10]]];
+			console.log(flat(test_array, 2));
+		</script>
+	</body>
+</html>

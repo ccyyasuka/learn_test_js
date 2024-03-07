@@ -13,8 +13,8 @@ root.render(
 		<App />
 		{/* <List_func></List_func>
 		<MultiClick></MultiClick> */}
-		<Prototype></Prototype>
-		<Js_func></Js_func>
+		{/* <Prototype></Prototype>
+		<Js_func></Js_func> */}
 	</React.StrictMode>
 );
 

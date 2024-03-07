@@ -31,38 +31,13 @@
 			// document.getElementById('button').addEventListener('click', function () {
 			// 	setUseAction.cancel();
 			// });
+
+			// 使用样例var setUseAction = debounce(getUserAction, 1000, true);
 			function debounce(func, wait, immediate) {
-				let timeout, context, args, result;
+				let args, context, timeout, result;
 				let debounced = function () {
-					let args = arguments; //取参数
-					let context = this; //取绑定这个函数的dom
-					if (timeout) {
-						clearTimeout(timeout); //计时过程中又遇到了事件，就删掉原来事件的计时
-					}
-					if (immediate) {
-						let callNow = !timeout; //执行过，timeout就为true，callNow为false，就不立即执行
-						timeout = setTimeout(function () {
-							timeout = null;
-						}, wait); //wait后把timeout重置为null，并立刻生成当前timeout
-						if (callNow) result = func.apply(context, args);
-					} else {
-						timeout = setTimeout(function () {
-							func.apply(context, args);
-						}, wait);
-					}
-					return result;
-				};
-				debounced.cancel = function () {
-					clearTimeout(timeout);
-					timeout = null;
-				};
-				return debounced;
-			}
-			function debounce(func, wait, immediate) {
-				let args, context, res, timeout;
-				let debounced = function () {
-					context = this;
-					args = arguments;
+					let args = arguments;
+					let context = this;
 					if (timeout) {
 						clearTimeout(timeout);
 					}
@@ -72,14 +47,18 @@
 							timeout = null;
 						}, wait);
 						if (callNow) {
-							res = func.apply(context, args);
+							result = func.apply(context, args);
 						}
 					} else {
-						timeout = setTimeout(() => {
+						setTimeout(() => {
 							func.apply(context, args);
 						}, wait);
 					}
-					return res;
+					return result;
+				};
+				debounced.cancel = () => {
+					clearTimeout(timeout);
+					timeout = null;
 				};
 				return debounced;
 			}

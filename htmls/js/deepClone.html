@@ -36,8 +36,9 @@
 							// 使用原对象的构造方法，可以保留对象原型__proto__上的数据，
 							// 如果直接使用普通的{}，那么原型必然是丢失了的。
 							const result = new target.constructor();
-							map.set(target, result);
+							map.set(target, result); //循环引用只发生在object，只在这里保存即可
 							// Object.entries()返回一个数组，其元素是object上的属性键值对相对应的数组
+							//注意！！！！！！！！！！
 							for (const [k, v] of Object.entries(target)) {
 								result[k] = clone(v);
 							}

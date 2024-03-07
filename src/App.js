@@ -1,32 +1,45 @@
-import logo from './logo.svg';
-import './App.css';
+// import logo from './logo.svg';
+// import './App.css';
+import createElement from './createElement.js';
+import myRender from './myRender.js';
+// import render from './render.js';
+// import { useState } from './render.js';
+import { useState } from './myRender.js';
+// const handleChange = e => {
+// 	renderer(e.target.value);
+// };
 
-function App() {
-	function clone(target, map = new Map()) {
-		// debugger;
-		if (typeof target === 'object') {
-			let res = Array.isArray(target) ? [] : {};
-			if (map.get(target)) {
-				return map.get(target);
-			}
-			map.set(target, res);
-			for (const key in target) {
-				res[key] = clone(target[key], map);
-			}
-			return res;
-		}
-		return target;
-	}
-	const target = {
-		field3: {
-			child: 'child',
-		},
-		field4: [2, 4, 8],
-	};
-	target.target = target;
-	const res = clone(target);
-	console.log(res);
-	return <div />;
-}
+const container = document.querySelector('#root');
 
-export default App;
+// const renderer = value => {
+// 	console.log(1);
+// 	const element = createElement(
+// 		'div',
+// 		null,
+// 		createElement('input', {
+// 			value: value,
+// 			oninput: e => {
+// 				handleChange(e);
+// 			},
+// 		}),
+// 		createElement('h2', null, value)
+// 	);
+
+// 	myRender(element, container);
+// };
+// renderer('Hello');
+
+// const App = props => {
+// 	return createElement('h1', null, 'Hi', props.name);
+// };
+// const element = createElement(App, { name: 'Tom' });
+// myRender(element, container);
+
+const Counter = () => {
+	const [state, setState] = useState(1);
+	return createElement('h1', { onclick: () => setState(prev => prev + 1) }, state);
+};
+
+const element = createElement(Counter);
+// render(element, container);
+myRender(element, container);

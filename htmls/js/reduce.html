@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="x-ua-compatible" content="IE=edge, chrome=1" />
+		<style></style>
+	</head>
+
+	<body>
+		<script>
+			Array.prototype.reduce = function (cb, initialValue) {
+				debugger;
+				const arr = this;
+				let total = initialValue || arr[0];
+				// 有初始值的话从0遍历，否则从1遍历
+				for (let i = initialValue ? 0 : 1; i < arr.length; i++) {
+					total = cb(total, arr[i], i, arr); //cb（回调函数）传入了四个参数是因为这样设计的回调函数 cb 与JavaScript中原生的 Array.prototype.reduce 方法的回调函数参数保持一致。
+				}
+				return total;
+			};
+			// 使用一个求和的回调函数
+			const sum = [1, 2, 3, 4].reduce(function (acc, curValue) {
+				return acc + curValue;
+			}, 0); // 应该返回 10
+			console.log(sum);
+		</script>
+	</body>
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="x-ua-compatible" content="IE=edge, chrome=1" />
+		<style></style>
+	</head>
+
+	<body>
+		<script>
+			Array.prototype.reduce = function (func, ini) {
+				const arr = this;
+				let acc = ini ? ini : arr[0];
+				for (let i = ini ? 0 : 1; i < arr.length; i += 1) {
+					acc = func(acc, arr[i]);
+				}
+				return acc;
+			};
+			// 使用一个求和的回调函数
+			const sum = [1, 2, 3, 4].reduce(function (acc, curValue) {
+				return acc + curValue;
+			}, 10); // 应该返回 10
+			console.log(sum);
+		</script>
+	</body>
+</html>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>JavaScript Execution Context Demo</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+			}
+		</style>
+	</head>
+	<body>
+		<script>
+			// 所谓Promise，本质来说就是一个容器，它代表了一个尚未完成但是未来将会完成的操作的结果，
+			// 里面保存着某个未来才会结束的事件（通常是一个异步操作）的结果。
+			// function readFile(filename) {
+			// 	// 创建一个Promise对象 里面保证未来会做一个操作，里面也存储了这个操作的结果
+			// 	return new Promise((resolve, reject) => {
+			// 		// 异步操作：读取文件
+			// 		fs.readFile(filename, 'utf8', (err, data) => {
+			// 			if (err) {
+			// 				reject(err); // 如果有错误，拒绝这个Promise，传递错误信息
+			// 			} else {
+			// 				resolve(data); // 如果成功，解决这个Promise，传递文件内容
+			// 			}
+			// 		});
+			// 	});
+			// }
+
+			// // 使用Promise
+			// readFile('example.txt')
+			// 	.then(data => {
+			// 		console.log('File content:', data);
+			// 	})
+			// 	.catch(err => {
+			// 		console.error('Error reading file:', err);
+			// 	});
+
+			const promise = new Promise(function (resolve, reject) {
+				if (1) {
+					/* 异步操作成功 */
+					resolve(10);
+					console.log('异步');
+				} else {
+					reject('error');
+				}
+			}).then(v => {
+				console.log(v);
+			});
+			// .then(
+			// 	function (json) {
+			// 		console.log('Contents: ' + json);
+			// 	},
+			// 	function (error) {
+			// 		console.error('出错了', error);
+			// 	}
+			// );
+
+			var p1 = Promise.resolve(33); // 返回一个resolved状态的Promise
+			var p2 = Promise.resolve(p1); // 其实就是p1
+			p2.then(function (value) {
+				// 是一个异步函数，扔到微任务队列, 等到栈空时，在来检查时候还有微任务。
+				console.log('value: ' + value);
+			});
+
+			// 不优雅的写法
+			let getInfoA = new Promise((resolve, reject) => {
+				console.log('小A开始执行了');
+				resolve();
+			}).then(res => {
+				new Promise((resolve, reject) => {
+					// 由此可见，new Promise就是新建一个容器，里面保存着某个未来才会结束的事件
+					console.log('小B开始执行了');
+					resolve();
+				}).then(res => {
+					new Promise((resolve, reject) => {
+						console.log('小C开始执行了');
+						resolve();
+					}).then(res => {
+						console.log('全都执行完了！');
+					});
+				});
+			});
+
+			// 用race,all实现优雅写法
+			let getInfoA1 = new Promise((resolve, reject) => {
+				console.log('小A开始执行了');
+				resolve();
+			});
+			let getInfoB1 = new Promise((resolve, reject) => {
+				console.log('小B开始执行了');
+				resolve();
+			});
+			let getInfoC1 = new Promise((resolve, reject) => {
+				console.log('小C开始执行了');
+				resolve();
+			});
+			Promise.all([getInfoA1, getInfoB1, getInfoC1]).then(res => {
+				console.log('全都执行完了！');
+			});
+			//***********************************
+			// Promise和async两种写法调用异步操作：
+			//***********************************
+			function getList() {
+				return new Promise((resolve, reject) => {
+					// 使用setTimeout来模拟异步请求
+					setTimeout(() => {
+						// 假设这里是请求成功后的数据
+						const mockData = {
+							status: 200,
+							data: ['item1', 'item2', 'item3'], // 示例数据
+						};
+						resolve(mockData);
+					}, 1000); // 假设请求需要1秒钟时间
+				});
+			}
+			function getList() {
+				return new Promise((resolve, reject) => {
+					setTimeout(() => {
+						data = 1;
+						resolve(data);
+					}, 1000);
+				});
+			}
+			// 用promise做
+			function iniWorkPromise() {
+				getList()
+					.then(data => {
+						console.log('iniWorkPromise', data);
+					})
+					.catch(err => {
+						console.log(err);
+					});
+			}
+			iniWorkPromise();
+			// 用await做 async返回一个promise对象，await等待一个promise结果
+			async function iniWorkAsync() {
+				let res = await getList();
+				return res;
+			}
+			iniWorkAsync().then(data => {
+				console.log('iniWorkAsync', data);
+			});
+
+			//上下两种getList的思想是一样的，先创建一个新的Promise对象，在这个Promise对象中进行异步操作，把异步操作的结果交给resolve
+			// function getList() {
+			// 	return new Promise((resolve, reject) => {
+			// 		$axios('/pt/getList').then(
+			// 			res => {
+			// 				resolve(res);//注意这个resolve和reject不来自于axios，而来自于new Promise
+			// 			},
+			// 			err => {
+			// 				reject(err);
+			// 			}
+			// 		);
+			// 	});
+			// }
+			// Promise
+			function initTable1() {
+				getList()
+					.then(res => {
+						console.log(res);
+					})
+					.catch(err => {
+						this.$message(err); // element的语法
+					});
+			}
+			initTable1();
+
+			// async await
+			async function initTable2() {
+				// table列表查
+				const getData = await getList(this.searchParams);
+				return getData;
+			}
+			// 1、函数前面会加一个async修饰符，来证明这个函数是一个异步函数；
+			// 2、await 是个运算符，用于组成表达式，它会阻塞后面的代码
+			// 3、await 如果等到的是 Promise 对象，则得到其 resolve值。
+			// 1、async返回的是一个promise对象，函数内部 return 返回的值，会成为 then 方法回调函数的参数；
+			// 2、await如果等到的不是promise对象，就得到后面表达式的运算结果。
+			initTable2().then(res => {
+				console.log(res);
+			});
+		</script>
+	</body>
+</html>

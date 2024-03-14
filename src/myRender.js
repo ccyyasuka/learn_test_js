@@ -21,6 +21,7 @@
 
 // 初始化操作全部写在这里
 function myRender(element, container) {
+	// debugger;
 	// nextUnitOfWork = {
 	// 	dom: container,
 	// 	props: {
@@ -31,6 +32,8 @@ function myRender(element, container) {
 	// 	parent: null,
 	// }; //这就是一个初始化的fiber
 	wipRoot = {
+		//wipRoot的sibling，parent等等为什么不设置？
+		//初始化时，element是你想渲染的东西，初始化的是element的父节点的fiber
 		//workingInProgressRoot
 		// 标识render是否已经结束，是否可以进入commit
 		dom: container,
@@ -54,8 +57,9 @@ function createDom(fiber) {
 }
 //commit阶段 异步渲染构建fiber树结束，同步commit开始
 function commitRoot() {
-	deletions.forEach(commitRoot); //删除所有要删除的fiber
+	deletions.forEach(item => commitWork(item)); //删除所有要删除的fiber
 	commitWork(wipRoot.child);
+	// commitEffects(wipRoot);
 	currentRoot = wipRoot; //保存上次的fiber树的引用
 	wipRoot = null;
 }
@@ -64,6 +68,8 @@ function commitWork(fiber) {
 	if (!fiber) {
 		return;
 	}
+	// 如果当前fiber是函数的fiber，那就用commitWork(fiber.child)再往下一步到当前fiber的child，
+	// child会寻找最近的父DOM节点，大概率是函数fiber的parent，那函数fiber的parent的dom挂住函数fiber的child的dom即可
 	//函数式组件没有自己的dom，所以需要循环向上查找，找到最近的存在dom的fiber节点，针对节点更新要向上查找
 	let domParentFiber = fiber.parent;
 	while (!domParentFiber.dom) {
@@ -188,8 +194,11 @@ function updateDom(dom, prevProps, nextProps) {
 // }
 
 function reconcileChildren(wipFiber, elements) {
+	// 用父fiber和子element构建子fiber和fiber树
+	// debugger;
 	let index = 0;
 	// 如果有alternate，就返回它的child，没有，就返回undefined
+	// 这个alternate最先是在setState中引入的，再在reconcileChildren中通过alternate: oldFiber遍历引入
 	let oldFiber = wipFiber.alternate && wipFiber.alternate.child;
 
 	let prevSibling = null;
@@ -209,7 +218,7 @@ function reconcileChildren(wipFiber, elements) {
 				// 继承dom
 				dom: oldFiber.dom,
 				parent: wipFiber,
-				alternate: oldFiber,
+				alternate: oldFiber, //oldFiber是wipFiber的alternate的child，是上一次渲染对应位置的fiber
 				effectTag: 'UPDATE',
 			};
 		}
@@ -232,6 +241,7 @@ function reconcileChildren(wipFiber, elements) {
 
 		if (oldFiber) {
 			// 下一个oldFiber
+			// 遍历wipFiber的若干个fiber
 			oldFiber = oldFiber.sibling;
 		}
 
@@ -254,11 +264,12 @@ function reconcileChildren(wipFiber, elements) {
 // step2: 根据children创建若干新fiber,构建fiber链表
 // step3:返回nextUnitOfWork
 function performUnitOfWork(fiber) {
-	// step1. 给fiber渲染一个新dom 放在了updateHostComponent(fiber)里
+	// step1. 给fiber创建一个新dom 放在了updateHostComponent(fiber)里
 	// if (!fiber.dom) {
 	// 	fiber.dom = createDom(fiber);
 	// }
 	//判断是否是函数式组件
+	debugger;
 	const isFunctionComponent = fiber.type instanceof Function;
 	if (isFunctionComponent) {
 		updateFunctionComponent(fiber);
@@ -324,34 +335,45 @@ let wipFiber = null;
 let hookIndex = 0;
 //处理函数式组件
 function updateFunctionComponent(fiber) {
+	// 函数式组件没有dom，所以没有这一步
+	//  if (!fiber.dom) {
+	// 	fiber.dom = createDOM(fiber);
+	// }
+	debugger;
 	wipFiber = fiber;
 	hookIndex = 0;
-	wipFiber.hooks = []; //储存当前组件注册的所有hook，fiber同时也有了hoo  ks
+	wipFiber.hooks = []; //储存当前组件注册的所有hook，fiber同时也有了hooks
 
 	//函数式组件的children是通过运行而来的
 	//也就是函数返回的jsx是函数式组件的孩子，函数式组件没有自己的dom节点,返回的jsx是他孩子的dom
-	const children = [fiber.type(fiber.props)];
+	debugger;
+	console.log(fiber);
+	const children = [fiber.type(fiber.props)]; //新建element
 	reconcileChildren(fiber, children);
 }
 
 export function useState(init) {
 	// hook用来连接前后两次渲染，必须有全局变量来记录上一次渲染的信息，也就是wipFiber
+	// 全局的wipFiber来自新建函数式组件的element时，wipFiber已经被置为函数式组件的fiber，
+	// wipFiber.alternate.hooks里面保存了上一次的state和action
 	const oldHook = wipFiber.alternate?.hooks[hookIndex];
 	const hook = {
 		state: oldHook ? oldHook.state : init,
-		queue: [],
+		actionQueue: [],
 	};
 	//外部通过setState更新了hook.queue，里面充满了prev => prev + 1之类的函数
-	const actions = oldHook ? oldHook.queue : [];
+	const actions = oldHook ? oldHook.actionQueue : [];
 	// 遍历queue，用函数（也叫action）的返回值更新state
 	actions.forEach(action => {
 		hook.state = action(hook.state);
 	});
 	const setState = function (action) {
-		hook.queue.push(action);
+		hook.actionQueue.push(action);
 		//和render的操作基本一致，进行初始化，设置nextUnitOfWork，触发下一轮渲染
 		wipRoot = {
-			//currentRoot是上次渲染的fiber树
+			// currentRoot是上次渲染的fiber树
+			// currentRoot的任务已经结束了
+			// currentRoot->wipRoot->nextUnitOfWork开始下一轮操作
 			dom: currentRoot.dom,
 			props: currentRoot.props,
 			alternate: currentRoot,
@@ -359,6 +381,7 @@ export function useState(init) {
 		nextUnitOfWork = wipRoot;
 		deletions = [];
 	};
+	//一个函数式组件对应若干个useState，一个useState有一个hook
 	wipFiber.hooks.push(hook);
 	hookIndex += 1;
 	return [hook.state, setState];
@@ -397,10 +420,51 @@ function WorkLoop(deadline) {
 		//说明构建fiber树已经结束了，该进入commit阶段了
 		commitRoot();
 	}
+	// 所有任务结束后，始终跳不进去上面这两个循环，相当于隔一段时间只调用requestIdleCallback，问问还有剩余的工作要做吗
 
 	//requestIdleCallback指浏览器调用栈为空时执行这个任务
 	// 递归调用没法异步，当前方法是把任务拆成若干个小任务，再用requestIdleCallback执行这个任务
 	requestIdleCallback(WorkLoop);
+}
+
+// useEffect实现
+function useEffect(effect, deps) {
+	const oldHook = wipFiber.alternate && wipFiber.alternate.hooks && wipFiber.alternate.hooks[hookIndex];
+	const hook = {
+		deps,
+	};
+
+	const hasChangedDeps = oldHook ? deps.some((dep, i) => !Object.is(dep, oldHook.deps[i])) : true;
+	if (hasChangedDeps) {
+		// 清理上一个effect
+		if (oldHook && oldHook.cleanup) {
+			oldHook.cleanup();
+		}
+		// 将effect的执行延迟到commit阶段
+		hook.effect = effect;
+	}
+
+	wipFiber.hooks.push(hook);
+	hookIndex++;
+}
+
+// 在commitRoot或commitWork的适当时机执行effect
+function commitEffects(fiber) {
+	if (!fiber) {
+		return;
+	}
+	let fiberEffect = fiber;
+	while (fiberEffect) {
+		if (fiberEffect.hooks) {
+			fiberEffect.hooks.forEach(hook => {
+				if (hook.effect) {
+					hook.cleanup = hook.effect();
+					hook.effect = null;
+				}
+			});
+		}
+		fiberEffect = fiberEffect.sibling || fiberEffect.child;
+	}
 }
 
 export default myRender;

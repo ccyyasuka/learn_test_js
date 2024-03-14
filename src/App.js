@@ -5,14 +5,12 @@ import myRender from './myRender.js';
 // import render from './render.js';
 // import { useState } from './render.js';
 import { useState } from './myRender.js';
+const container = document.querySelector('#root');
 // const handleChange = e => {
 // 	renderer(e.target.value);
 // };
 
-const container = document.querySelector('#root');
-
 // const renderer = value => {
-// 	console.log(1);
 // 	const element = createElement(
 // 		'div',
 // 		null,
@@ -41,5 +39,6 @@ const Counter = () => {
 };
 
 const element = createElement(Counter);
+// console.log(element);
 // render(element, container);
 myRender(element, container);

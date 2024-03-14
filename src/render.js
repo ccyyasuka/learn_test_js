@@ -81,8 +81,8 @@ function commitWork(fiber) {
 	if (!fiber) {
 		return;
 	}
-
-	// 寻找最近的父DOM节点
+	// 如果当前fiber是函数的fiber，那就用commitWork(fiber.child)再往下一步到当前fiber的child，
+	// child会寻找最近的父DOM节点，大概率是函数fiber的parent，那函数fiber的parent的dom挂住函数fiber的child
 	let domParentFiber = fiber.parent;
 	while (!domParentFiber.dom) {
 		domParentFiber = domParentFiber.parent;
@@ -97,6 +97,7 @@ function commitWork(fiber) {
 		// dom，之前的props，现在的props
 		updateDOM(fiber.dom, fiber.alternate.props, fiber.props);
 	}
+
 	commitWork(fiber.child);
 	commitWork(fiber.sibling);
 }
@@ -171,6 +172,11 @@ let hookIndex = null;
 
 // 处理函数式组件
 function updateFunctionComponent(fiber) {
+	// 函数式组件没有dom，所以没有这一步
+	//  if (!fiber.dom) {
+	// 	fiber.dom = createDOM(fiber);
+	// }
+	debugger;
 	wipFiber = fiber;
 	hookIndex = 0;
 	wipFiber.hooks = [];
@@ -224,6 +230,7 @@ function updateHostComponent(fiber) {
 }
 
 function reconcileChildren(wipFiber, elements) {
+	debugger;
 	let index = 0;
 	// 如果有alternate，就返回它的child，没有，就返回undefined
 	let oldFiber = wipFiber.alternate && wipFiber.alternate.child;

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="x-ua-compatible" content="IE=edge, chrome=1" />
+		<title>debounce</title>
+		<style>
+			/* styles.css */
+			#animatedBox {
+				width: 50px;
+				height: 50px;
+				background-color: red;
+				position: absolute;
+				/* left: 0; */
+				top: 50px;
+				will-change: transform; /* 优化提示 */
+			}
+			.animated-box-css {
+				width: 100px;
+				height: 100px;
+				top: 300px;
+				background-color: blue;
+				position: relative;
+				animation: slide 3s infinite alternate;
+				/* alternate - 动画先向前播放，然后向后 */
+			}
+			.shape-shift,
+			.rotating-box {
+				width: 100px;
+				height: 100px;
+				background-color: green;
+				position: absolute;
+				top: 50px;
+			}
+
+			.shape-shift {
+				left: 50px;
+				animation: morph 6s infinite alternate;
+			}
+
+			.rotating-box {
+				left: 200px;
+				animation: spin 2s infinite linear;
+				top: 400px;
+			}
+			.loading {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				height: 100vh;
+				/* 在屏幕的居中 */
+			}
+			.loading span {
+				display: block;
+				width: 10px;
+				height: 10px;
+				background-color: black;
+				border-radius: 50%;
+				margin: 0 5px;
+				animation: bounce 0.6s infinite alternate;
+			}
+
+			.loading span:nth-child(1) {
+				animation-delay: 0s;
+			}
+
+			.loading span:nth-child(2) {
+				animation-delay: 0.2s;
+			}
+
+			.loading span:nth-child(3) {
+				animation-delay: 0.4s;
+			}
+			/* 使用 cubic-bezier 定义动画速度曲线 */
+			@keyframes slide {
+				0% {
+					left: 0;
+				}
+				50% {
+					left: 50%;
+					animation-timing-function: cubic-bezier(0.2, 1, 0.8, 1);
+					/* animation-timing-function 属性规定动画的速度曲线。这也是一个css属性 */
+				}
+				100% {
+					left: 90%;
+				}
+			}
+
+			/* 形状变化动画 */
+			@keyframes morph {
+				0%,
+				100% {
+					border-radius: 0%;
+				}
+				50% {
+					border-radius: 50%;
+				}
+			}
+
+			/* 旋转动画 */
+			@keyframes spin {
+				from {
+					transform: rotate(0deg);
+				}
+				to {
+					transform: rotate(360deg);
+				}
+			}
+
+			@keyframes bounce {
+				from {
+					transform: translateY(0);
+				}
+				to {
+					transform: translateY(-20px);
+				}
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="animatedBox"></div>
+		<div class="animated-box-css"></div>
+		<div class="shape-shift"></div>
+		<div class="rotating-box"></div>
+		<div class="loading">
+			<span></span>
+			<span></span>
+			<span></span>
+		</div>
+
+		<script>
+			let box = document.getElementById('animatedBox');
+			let position = 0;
+			let speed = 5; // 每帧移动的像素
+
+			// js实现动画的核心就在于改变dom的位置
+			function animate(timestamp) {
+				// 回调函数可以接收一个时间戳，表示当前的执行距离第一次执行相差的时间
+				// console.log('timestamp', timestamp);
+				position += speed; // 更新位置
+				// box.style.left = position + 'px'; // 应用新位置
+				box.style.transform = `translateX(${position}px)`; // 应用新位置
+
+				if (position <= 0 || position > window.innerWidth - box.offsetWidth) {
+					speed = -speed;
+				}
+				requestAnimationFrame(animate);
+			}
+
+			requestAnimationFrame(animate); // 启动动画
+
+			// function fun() {
+			// 	for (let i = 0; i < 1000000000; i++) {
+			// 		//借助for循环多次执行延时
+			// 	}
+			// 	document.write('定时器' + '<br>');
+			// 	requestAnimationFrame(fun);
+			// }
+			// fun();
+			// function fun() {
+			// 	for (let i = 0; i < 1000000000; i++) {
+			// 		//借助for循环多次执行延时
+			// 	}
+			// 	document.write('定时器' + '<br>');
+			// }
+			// //间隔200ms周期性调用函数fun
+			// setInterval(fun, 200);
+		</script>
+	</body>
+</html>

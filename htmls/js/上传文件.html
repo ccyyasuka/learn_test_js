@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>文件上传示例</title>
+	</head>
+	<body>
+		<form id="uploadForm" enctype="multipart/form-data">
+			<input type="file" id="fileInput" name="file" />
+			<button type="button" id="submitBtn">上传文件</button>
+		</form>
+
+		<script>
+			document.getElementById('submitBtn').addEventListener('click', function () {
+				debugger;
+				var formData = new FormData();
+				var fileInput = document.getElementById('fileInput');
+				var file = fileInput.files[0];
+				formData.append('file', file);
+
+				fetch('/upload', {
+					method: 'POST',
+					body: formData,
+				})
+					.then(response => response.text())
+					.then(data => {
+						console.log(data);
+						alert('文件上传成功！');
+					})
+					.catch(error => {
+						console.error('Error:', error);
+						alert('上传失败！');
+					});
+			});
+		</script>
+	</body>
+</html>

@@ -33,38 +33,45 @@
 			// bindFoo1();
 			// // {value: 1, name: "Jack", age: 20}
 
-			Function.prototype.myBind = function (context) {
-				let args = [...arguments].slice(1);
-				let func = this;
-				let fNop = function () {};
-				let resFunc = function () {
-					let bindArgs = [...arguments];
-					args = args.concat(bindArgs);
-					return func.apply(this instanceof resFunc ? this : context, args);
-				};
-				fNop.prototype = this.prototype;
-				resFunc.prototype = new fNop();
-				return resFunc;
-			};
-
-			//
-			// 简易写法 之后分析是否正确
 			// Function.prototype.myBind = function (context) {
-			// 	// 判断调用对象是否为函数
-			// 	if (typeof this !== 'function') {
-			// 		throw new Error('Type error');
-			// 	}
-			// 	// 获取参数
-			// 	const args = [...arguments].slice(1);
-			// 	const fn = this;
-			// 	return function Fn() {
-			// 		return fn.apply(
-			// 			this instanceof Fn ? this : context,
-			// 			// 当前的这个 arguments 是指 Fn 的参数
-			// 			args.concat(...arguments)
-			// 		);
+			// 	if (typeof this !== 'function') throw new Error('error');
+			// 	let func = this;
+			// 	let outArgs = [...arguments].slice(1);
+			// 	let fNop = function () {};
+			// 	let fRes = function () {
+			// 		let inArgs = [...arguments];
+			// 		return func.apply(this instanceof fRes ? this : context, outArgs.concat(inArgs));
 			// 	};
+
+			// 	fNop.prototype = this.prototype;
+			// 	fRes.prototype = new fNop();
+			// 	return fRes;
 			// };
+
+			// Function.prototype.myBind = function (obj) {
+			// 	let func = this;
+			// 	let outArgs = [...arguments].slice(1);
+			// 	let res = function () {
+			// 		let inArgs = [...arguments];
+			// 		return func.apply(this instanceof res ? this : obj, outArgs.concat(inArgs));
+			// 	};
+			// 	let temp = function () {};
+			// 	temp.prototype = this.prototype;
+			// 	res.prototype = new temp();
+			// 	return res;
+			// };
+			Function.prototype.myBind = function (context) {
+				let func = this;
+				let outArgs = [...arguments].slice(1);
+				let res = function () {
+					let inArgs = [...arguments];
+					return func.apply(this instanceof res ? this : context, outArgs.concat(inArgs));
+				};
+				let temp = function () {};
+				temp.prototype = this.prototype;
+				res.prototype = new temp();
+				return res;
+			};
 
 			//测试1
 			// debugger;

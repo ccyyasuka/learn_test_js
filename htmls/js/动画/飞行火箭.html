@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+			}
+			.box {
+				width: 200px;
+				height: 200px;
+				position: relative;
+				margin: 300px auto;
+			}
+			img {
+				width: 200px;
+				height: 200px;
+				animation: zd 0.5s linear 0s infinite alternate;
+			}
+			@keyframes zd {
+				from {
+					transform: translateX(20px) translateY(20px);
+				}
+				to {
+					transform: translateX(-20px) translateY(-20px);
+				}
+			}
+			.line {
+				width: 2px;
+				height: 120px;
+				background-color: blue;
+				position: absolute;
+				top: 0;
+				left: 0;
+				animation: yd 0.8s linear 0s infinite;
+			}
+			.line2 {
+				height: 80px;
+				left: 30px;
+				animation: yd 0.8s linear 0.4s infinite;
+			}
+			.line3 {
+				height: 100px;
+				left: 100px;
+				animation: yd 0.8s linear 0.5s infinite;
+			}
+			.line4 {
+				height: 200px;
+				left: 180px;
+				animation: yd 0.8s linear 0.6s infinite;
+			}
+			@keyframes yd {
+				0% {
+					transform: rotate(45deg) translateY(-200px);
+					opacity: 0;
+				}
+				50% {
+					opacity: 1;
+				}
+				to {
+					transform: rotate(45deg) translateY(200px);
+					opacity: 0;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="box">
+			<img src="../../img/huojian.png" alt="" />
+			<div class="line line1"></div>
+			<div class="line line2"></div>
+			<div class="line line3"></div>
+			<div class="line line4"></div>
+		</div>
+	</body>
+</html>

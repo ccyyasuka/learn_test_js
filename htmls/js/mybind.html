@@ -96,7 +96,7 @@
 			// 	};
 			// };
 
-			//测试1
+			//测试1 普通函数
 			debugger;
 			let value1 = 2;
 			let foo1 = {
@@ -111,14 +111,14 @@
 			}
 
 			let bindFoo1 = bar1.myBind(foo1, 'Jack', 20); // 返回一个函数
-			console.log(bindFoo1());
+			console.log(bindFoo1()); //bindFoo1()中this指向window
 			// {value: 1, name: "Jack", age: 20}
 
 			let bindFoo2 = bar1.myBind(foo1, 'Jack'); // 返回一个函数
 			console.log(bindFoo2(20));
 			// {value: 1, name: "Jack", age: 20}
 
-			//测试2
+			//测试2 作为构造函数
 
 			let value = 2;
 			let foo = {

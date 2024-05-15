@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Cross Tab Communication</title>
+	</head>
+	<body>
+		<h2>Cross Tab Communication Demo</h2>
+		<input type="text" id="message" placeholder="Type a message..." />
+		<button id="send">Send Message</button>
+		<div id="messages"></div>
+
+		<script>
+			// 发送消息到其他标签页的函数
+			function sendMessage() {
+				const message = document.getElementById('message').value;
+				localStorage.setItem('message', JSON.stringify({ content: message, timestamp: Date.now() }));
+				// localStorage.setItem是Web Storage API的一部分，用于在浏览器的本地存储中保存键值对数据。数据会被永久保存，直到显式删除或浏览器缓存被清理。
+				window.dispatchEvent(new Event('storage'));
+				// 设计目的：storage事件设计之初就是为了在页面的localStorage或sessionStorage发生改变时，
+				// 通知同一域下的所有其他页面（或标签页）。这是一种浏览器层面上的跨页面通信机制。
+				// 工作原理：当一个页面更新了localStorage（或sessionStorage）中的数据，浏览器会自动在其他所有同源页面中触发storage事件。
+				// 这个机制使得数据更新能够被其他页面监听到，而无需在这些页面中显式派发事件。
+
+				// localStorage 中的键值对总是以字符串的形式存储
+			}
+
+			// 处理接收到的消息
+			function handleMessage(e) {
+				if (e.key === 'message') {
+					const messageData = JSON.parse(e.newValue);
+					const messagesDiv = document.getElementById('messages');
+					const messageElement = document.createElement('div');
+					messageElement.textContent = `Received message: ${messageData.content}`;
+					messagesDiv.appendChild(messageElement);
+				}
+			}
+
+			// 绑定事件监听器
+			document.getElementById('send').addEventListener('click', sendMessage);
+			// storage事件仅在其他标签页修改localStorage时在这些标签页上触发。
+			// 在同一个标签页上再次触发事件来处理同样的数据通常是不必要的 因为代码已经在修改localStorage的同时可以直接访问修改的数据
+			window.addEventListener('storage', handleMessage);
+		</script>
+	</body>
+</html>

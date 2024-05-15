@@ -23,6 +23,18 @@
 				}
 				return arr.slice(); //当前数组的浅拷贝 因为不想改变原始数组
 			}
+			// let flatArray = function (arr, num) {
+			// 	if (num <= 0) {
+			// 		return arr;
+			// 	}
+			// 	return arr.reduce((all, cur) => {
+			// 		if (!Array.isArray(cur)) {
+			// 			return all.concat(cur);
+			// 		} else {
+			// 			return all.concat(flatArray(cur, num - 1));
+			// 		}
+			// 	}, []);
+			// };
 			let test_array = [1, [2, 3, 4]];
 
 			// let test_array = [1, [2, [3, [4, 5], 6], 7], 8, [9, [10]]];

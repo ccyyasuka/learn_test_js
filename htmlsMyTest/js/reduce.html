@@ -9,17 +9,18 @@
 	<body>
 		<script>
 			Array.prototype.reduce = function (func, ini) {
-				const arr = this;
-				let acc = ini ? ini : arr[0];
-				for (let i = ini ? 0 : 1; i < arr.length; i += 1) {
-					acc = func(acc, arr[i]);
+				let arr = this;
+				if (arr.length === 0) return undefined;
+				let total = ini ? ini : arr[0];
+				for (let i = ini ? 0 : 1; i < arr.length; i++) {
+					total = func(total, arr[i]);
 				}
-				return acc;
+				return total;
 			};
 			// 使用一个求和的回调函数
 			const sum = [1, 2, 3, 4].reduce(function (acc, curValue) {
 				return acc + curValue;
-			}, 10); // 应该返回 10
+			}, 10); // 应该返回 20
 			console.log(sum);
 		</script>
 	</body>

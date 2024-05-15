@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="x-ua-compatible" content="IE=edge, chrome=1" />
+		<title>debounce</title>
+		<style></style>
+	</head>
+
+	<body>
+		<script>
+			function heapify(arr, n, i) {
+				let largest = i; // 初始化最大值为根节点
+				let left = 2 * i + 1; // 左孩子
+				let right = 2 * i + 2; // 右孩子
+
+				// 如果左孩子大于根节点，则标记左孩子
+				if (left < n && arr[left] > arr[largest]) {
+					largest = left;
+				}
+
+				// 如果右孩子大于当前最大节点，则标记右孩子
+				if (right < n && arr[right] > arr[largest]) {
+					largest = right;
+				}
+
+				// 如果最大值不是根节点，交换它们
+				if (largest !== i) {
+					[arr[i], arr[largest]] = [arr[largest], arr[i]];
+					// 递归地调整受影响的子树
+					heapify(arr, n, largest);
+				}
+			}
+			function heapSort(arr) {
+				// 构建大顶堆
+				let n = arr.length;
+				debugger;
+				// 从最后一个非叶子节点开始向上构造大顶堆
+				for (let i = Math.floor(n / 2) - 1; i >= 0; i--) {
+					heapify(arr, n, i);
+				}
+				debugger;
+				// 一次提取元素，移动到数组的末尾，并调整堆结构
+				for (let i = n - 1; i > 0; i--) {
+					// 将堆顶元素与末尾元素交换
+					[arr[0], arr[i]] = [arr[i], arr[0]];
+					// 重新调整为大顶堆
+					heapify(arr, i, 0);
+				}
+			}
+
+			// 示例数组
+			const arr = [2, 11, 13, 1, 2, 5, 6, 7];
+			console.log('Original array:', arr);
+			heapSort(arr);
+			console.log('Sorted array:', arr);
+		</script>
+	</body>
+</html>

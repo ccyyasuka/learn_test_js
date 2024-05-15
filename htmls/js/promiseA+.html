@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>JavaScript Execution Context Demo</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+			}
+		</style>
+	</head>
+	<body>
+		<script>
+			const PENDING = 'pending';
+			const FULFILLED = 'fulfilled';
+			const REJECTED = 'rejected';
+			onFulfilledCallback = null;
+			onRejectedCallback = null;
+			class MyPromise {
+				constructor(executor) {
+					// executor 是一个执行器，进入会立即执行
+					// 并传入resolve和reject方法
+					executor(this.resolve, this.reject);
+				}
+
+				// 储存状态的变量，初始值是 pending
+				status = PENDING;
+
+				// 成功之后的值
+				value = null;
+				// 失败之后的原因
+				reason = null;
+
+				// resolve和reject为什么要用箭头函数？
+				// 如果直接调用的话，普通函数this指向的是window或者undefined
+				// 用箭头函数就可以让this指向当前实例对象
+				// 更改成功后的状态
+				resolve = value => {
+					// 只有状态是等待，才执行状态修改
+					if (this.status === PENDING) {
+						// 状态修改为成功
+						this.status = FULFILLED;
+						// 保存成功之后的值
+						this.value = value;
+						// ==== 新增 ====
+						// 判断成功回调是否存在，如果存在就调用
+						this.onFulfilledCallback && this.onFulfilledCallback(value);
+					}
+				};
+
+				// 更改失败后的状态
+				reject = reason => {
+					// 只有状态是等待，才执行状态修改
+					if (this.status === PENDING) {
+						// 状态成功为失败
+						this.status = REJECTED;
+						// 保存失败后的原因
+						this.reason = reason;
+						// ==== 新增 ====
+						// 判断失败回调是否存在，如果存在就调用
+						this.onRejectedCallback && this.onRejectedCallback(reason);
+					}
+				};
+
+				then(onFulfilled, onRejected) {
+					// 判断状态
+					if (this.status === FULFILLED) {
+						// 调用成功回调，并且把值返回
+						//所以promise如果是同步操作，then的根本目标就是直接执行
+						onFulfilled(this.value);
+					} else if (this.status === REJECTED) {
+						// 调用失败回调，并且把原因返回
+						onRejected(this.reason);
+					} else if (this.status === PENDING) {
+						//then是立刻执行的，Promise构造函数中传入的函数执行的动作则可能是过一会才执行，所以promise如果是异步操作，
+						// then的根本目标就是设置resolve将使用的回调函数
+						//setTimeout是异步的。它将在未来的某个时刻调用resolve函数。此时，JavaScript 事件循环会继续执行，
+						//如果你在创建Promise后马上调用then方法，那么回调函数会被设置，并且当setTimeout的回调执行时，resolve会调用这些回调函数。
+
+						// 这就是为什么在resolve和reject内部检查this.onFulfilledCallback和this.onRejectedCallback是否存在的原因：
+						//如果它们存在，表示then方法已经被调用并且已经设置了回调；如果不存在，表示then方法还没有被调用，回调还没有被设置。
+						this.onFulfilledCallback = onFulfilled;
+						this.onRejectedCallback = onRejected;
+					}
+				}
+			}
+			// const promise = new MyPromise((resolve, reject) => {
+			// 	resolve('success');
+			// 	reject('err');
+			// });
+
+			// promise.then(
+			// 	value => {
+			// 		console.log('resolve', value);
+			// 	},
+			// 	reason => {
+			// 		console.log('reject', reason);
+			// 	}
+			// );
+			const promise = new MyPromise((resolve, reject) => {
+				resolve('success');
+				// setTimeout(() => {
+				// 	resolve('success');
+				// }, 2000);
+			});
+
+			promise.then(
+				value => {
+					console.log('resolve', value);
+				},
+				reason => {
+					console.log('reject', reason);
+				}
+			);
+		</script>
+	</body>
+</html>

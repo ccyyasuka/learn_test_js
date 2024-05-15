@@ -14,13 +14,20 @@
 		<h1>JavaScript Execution Context Demo</h1>
 		<p>Check the console for output.</p>
 		<script>
-			function myNew(context) {
+			function myNew(func, ...args) {
 				let obj = new Object();
-				obj.__proto__ = context.prototype; //没有括号
-				let args = [...arguments].slice(1);
-				let res = context.apply(obj, args);
-				return typeof res === 'object' ? res : obj;
+				obj.__proto__ = func.prototype;
+				let res = func.apply(obj, args);
+				return res instanceof Object ? res : obj;
 			}
+			// function myNew(func) {
+			// 	if (typeof func !== 'function') throw new Error('error');
+			// 	let obj = new Object();
+			// 	obj.__proto__=func.prototype
+			// 	let args = [...arguments].slice(1);
+			// 	let res = func.apply(obj,args);
+			// 	return res instanceof func?obj:res
+			// }
 			function Person(name, age) {
 				this.name = name;
 				this.age = age;

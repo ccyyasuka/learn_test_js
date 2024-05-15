@@ -27,7 +27,9 @@
 				let previous = 0;
 				let final = function () {
 					previous = +new Date();
-					timeout = null; //这两步是重置
+					clearTimeout(timeout);
+					timeout = null; //这三步是重置
+
 					func.apply(context, args);
 					console.log('ddd');
 				};

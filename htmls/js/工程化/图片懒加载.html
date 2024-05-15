@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>懒加载图片示例</title>
+	</head>
+	<body>
+		<!-- https://via.placeholder.com/200x200.png?text=立即加载 -->
+		<!-- 懒加载的图片 -->
+		<div class="container">
+			<div class="img-area">
+				<img class="img" alt="loading" data-src="https://via.placeholder.com/200x200.png?text=立即加载" />
+			</div>
+			<div class="img-area">
+				<img class="img" alt="loading" data-src="https://via.placeholder.com/200x200.png?text=立即加载" />
+			</div>
+			<div class="img-area">
+				<img class="img" alt="loading" data-src="https://via.placeholder.com/200x200.png?text=立即加载" />
+			</div>
+		</div>
+
+		<script>
+			const imgNode = document.querySelectorAll('.img');
+			const imgList = Array.from(imgNode);
+			const clientHeight = document.documentElement.clientHeight;
+			//是否出现在可视区域
+			function isInVisible(scrollTop) {
+				imgList.forEach(el => {
+					if (el.offsetTop - scrollTop <= clientHight) {
+						loadImg(el);
+					}
+				});
+			}
+			//加载图片，替换src
+			function loadImg(el) {
+				if (!el.src) {
+					let src = el.dataset.src;
+					el.src = src;
+				}
+			}
+			//防抖
+			function throttle(cb, time = 200) {
+				let lastTime = null;
+				return function (...arg) {
+					let now = Date.now();
+					if (now - lastTime >= time || lastTime === null) {
+						cb.apply(this, arg);
+						lastTime = now;
+					}
+				};
+			}
+			//监听滚动
+			document.addEventListener('scroll', throttle(isInVisible));
+		</script>
+	</body>
+</html>

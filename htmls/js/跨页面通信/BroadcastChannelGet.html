@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>接收消息</title>
+	</head>
+	<body>
+		<h1>接收消息页面</h1>
+		<div id="messages"></div>
+		<script>
+			// 创建一个新的 Broadcast Channel
+			const channel = new BroadcastChannel('demo_channel');
+
+			// 监听接收消息
+			channel.onmessage = event => {
+				const messages = document.getElementById('messages');
+				const message = document.createElement('p');
+				message.textContent = `接收到消息: ${event.data}`;
+				messages.appendChild(message);
+			};
+		</script>
+	</body>
+</html>

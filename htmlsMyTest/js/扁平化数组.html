@@ -8,23 +8,17 @@
 
 	<body>
 		<script>
-			function flat(arr, num) {
-				if (num > 0) {
-					let res = arr.reduce((res, cur) => {
-						if (Array.isArray(cur)) {
-							return res.concat(flat(cur, num - 1));
-						} else {
-							return res.concat(cur);
-						}
-					}, []);
-					return res;
+			function flatArray(arr, num) {
+				if (num < 1) {
+					return arr;
 				}
-				return [...arr];
+				return arr.reduce((total, cur) => {
+					return cur instanceof Array ? total.concat(flatArray(cur, num - 1)) : total.concat(cur);
+				}, []);
 			}
-			// let test_array = [1, [2, 3, 4]];
 
 			let test_array = [1, [2, [3, [4, 5], 6], 7], 8, [9, [10]]];
-			console.log(flat(test_array, 2));
+			console.log(flatArray(test_array, 2));
 		</script>
 	</body>
 </html>

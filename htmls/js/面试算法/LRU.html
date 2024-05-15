@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="x-ua-compatible" content="IE=edge, chrome=1" />
+		<title>debounce</title>
+		<style></style>
+	</head>
+
+	<body>
+		<script>
+			// https://leetcode.cn/problems/lru-cache/solutions/2456294/tu-jie-yi-zhang-tu-miao-dong-lrupythonja-czgt/
+			class Node {
+				constructor(key, value) {
+					this.key = key;
+					this.value = value;
+					this.next = null;
+					this.pre = null;
+				}
+			}
+			class LRUCache {
+				constructor(max) {
+					this.max = max;
+					this.dummy = Node();
+					this.dummy.pre = this.dummy;
+					this.dummy.next = this.dummy;
+					this.map = new Map();
+					this.counter = 0;
+				}
+				get(key) {
+					let node = this.map.get(key);
+					if (!node) {
+						return -1;
+					} else {
+						//删除节点
+						this.delete(node);
+						// 添加到链表头
+						this.pushFront(node);
+						return node.value;
+					}
+				}
+				put(key, value) {
+					if (this.map.has(key)) {
+						let node = this.map.get(key);
+						node.value = value;
+						// map中如果命中，移动节点，就要先删除再添加
+						this.delete(node);
+						this.pushFront(node);
+					} else {
+						let node = new Node(key, value);
+						this.map.set(key, node);
+						this.counter++;
+						pushFront(node);
+						if (this.counter > this.max) {
+							this.map.delete(this.dummy.pre.key);
+							this.delete(this.dummy.pre);
+							this.counter--;
+						}
+					}
+				}
+				pushFront(node) {
+					node.next = this.dummy.next;
+					node.pre = this.dummy;
+					this.dummy.next.pre = node;
+					this.dummy.next = node;
+				}
+				delete(node) {
+					node.pre.next = node.next;
+					node.next.pre = node.pre;
+				}
+			}
+
+			var obj = new LRUCache(2);
+
+			obj.put(1, 13);
+			obj.put(2, 13);
+			obj.put(3, 13);
+			obj.put(4, 13);
+			var param_1 = obj.get(2);
+			console.log(param_1);
+		</script>
+	</body>
+</html>

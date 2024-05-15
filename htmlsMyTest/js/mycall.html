@@ -30,19 +30,39 @@
 			// obj.fn = fn;
 			// obj.fn();
 			// delete obj.fn;
-			Function.prototype.myCall = function (context) {
-				//this指向函数 context指向等待绑定的对象
-				if (typeof this !== 'function') {
-					throw new Error('Type Error');
-				}
+			// Function.prototype.myCall = function (context) {
+			// 	//this指向函数 context指向等待绑定的对象
+			// 	if (typeof this !== 'function') {
+			// 		throw new Error('Type Error');
+			// 	}
+			// 	let args = [...arguments].slice(1);
+			// 	if (!context) {
+			// 		context = window;
+			// 	}
+			// 	const symbol1 = Symbol(); //这里不是new Symbol()
+			// 	context[symbol1] = this;
+			// 	let res = context[symbol1](...args);
+			// 	delete context[symbol1]; //记得删除
+			// 	return res;
+			// };
+			// Function.prototype.myCall = function (context) {
+			// 	if (typeof this !== 'function') throw new Error('error');
+			// 	let func = this;
+			// 	let args = [...arguments].slice(1);
+			// 	if (!context) context = window;
+			// 	let fnSymbol = Symbol();
+			// 	context[fnSymbol] = func;
+			// 	let res = context[fnSymbol](...args);
+			// 	delete context[fnSymbol];
+			// 	return res;
+			// };
+			Function.prototype.myCall = function (obj) {
 				let args = [...arguments].slice(1);
-				if (!context) {
-					context = window;
-				}
-				const symbol1 = Symbol(); //这里不是new Symbol()
-				context[symbol1] = this;
-				let res = context[symbol1](...args);
-				delete context[symbol1]; //记得删除
+				let func = this;
+				let fSymbol = Symbol();
+				obj[fSymbol] = func;
+				let res = obj[fSymbol](...args);
+				delete obj[fSymbol];
 				return res;
 			};
 

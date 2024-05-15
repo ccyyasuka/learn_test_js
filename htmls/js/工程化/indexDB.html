@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>IndexedDB Example</title>
+		<script>
+			// 创建或打开数据库
+			function openDatabase() {
+				return new Promise((resolve, reject) => {
+					const request = indexedDB.open('MyTestDatabase', 1);
+
+					request.onerror = function (event) {
+						alert('Database error: ' + event.target.errorCode);
+						reject('Failed to open DB');
+					};
+
+					request.onupgradeneeded = function (event) {
+						const db = event.target.result;
+						// 创建了一张名为people的表，db中可以有很多表，每个表只有两列，id是一列，后面的所有“列”被放在了一个json中作为1列
+						const objectStore = db.createObjectStore('people', { keyPath: 'id', autoIncrement: true });
+						// createIndex创建索引
+						// param1 索引名称，param2 配置索引的键值，param3 配置对象 配置该属性是否是唯一的。
+						objectStore.createIndex('name', 'name', { unique: false });
+						objectStore.createIndex('email', 'email', { unique: true });
+					};
+
+					request.onsuccess = function (event) {
+						const db = event.target.result;
+						resolve(db);
+					};
+				});
+			}
+
+			// 添加数据
+			function addData(db) {
+				const name = document.getElementById('name').value;
+				const email = document.getElementById('email').value;
+				const age = document.getElementById('age').value; // 新增年龄
+				const address = document.getElementById('address').value; // 新增地址
+				const data = { name: name, email: email, age: age, address: address };
+
+				// 创建了一个事务。事务可以覆盖一个或多个对象存储（在此例中是'people'对象存储）。第一个参数是一个包含对象存储名称的数组。
+				// 对象存储就是传统数据库中的表
+				// 你可以在这个数组中列出所有你打算在这个事务中操作的对象存储。
+				// 第二个参数指定事务的模式。在这个例子中，使用的是'readwrite'模式，这意味着这个事务中的操作可以读取也可以修改数据。除了'readwrite'，
+				// 事务模式还可以是'readonly'（只能读取数据，不能修改），或'versionchange'（用于数据库结构的变更，如创建或删除对象存储，或者修改索引等）。
+				const transaction = db.transaction(['people'], 'readwrite');
+				// 这行代码从事务中获取一个对象存储的引用。对象存储相当于传统关系数据库中的表，是存储记录的地方。
+				// objectStore方法的参数是对象存储的名称，必须是事务创建时指定的对象存储之一。
+				const objectStore = transaction.objectStore('people');
+				const request = objectStore.add(data);
+
+				request.onsuccess = function () {
+					alert('Data added to the database');
+				};
+
+				request.onerror = function (event) {
+					alert('Error adding data: ' + event.target.errorCode);
+				};
+			}
+
+			// 读取数据
+			function readData(db) {
+				const id = Number(document.getElementById('id').value);
+				const transaction = db.transaction(['people']);
+				const objectStore = transaction.objectStore('people');
+				const request = objectStore.get(id);
+
+				request.onsuccess = function () {
+					if (request.result) {
+						alert('Data: ' + JSON.stringify(request.result));
+					} else {
+						alert('No data found');
+					}
+				};
+
+				request.onerror = function (event) {
+					alert('Error reading data: ' + event.target.errorCode);
+				};
+				// 读取全部名字为aa的数据，先找到所有名字为aa的json对应的index，再用getAll拿到数据
+				// const nameToFind = 'aa'; // 设定要查找的名字
+				// const transaction = db.transaction(['people'], 'readonly');
+				// const objectStore = transaction.objectStore('people');
+				// const index = objectStore.index('name');
+				// const request = index.getAll(nameToFind);
+
+				// request.onsuccess = function () {
+				// 	if (request.result.length > 0) {
+				// 		alert('Data: ' + JSON.stringify(request.result));
+				// 	} else {
+				// 		alert('No data found with name ' + nameToFind);
+				// 	}
+				// };
+
+				// request.onerror = function (event) {
+				// 	alert('Error reading data by name: ' + event.target.errorCode);
+				// };
+			}
+
+			// 删除数据
+			function deleteData(db) {
+				const id = Number(document.getElementById('deleteId').value);
+				const transaction = db.transaction(['people'], 'readwrite');
+				const objectStore = transaction.objectStore('people');
+				const request = objectStore.delete(id);
+
+				request.onsuccess = function () {
+					alert('Data deleted from the database');
+				};
+
+				request.onerror = function (event) {
+					alert('Error deleting data: ' + event.target.errorCode);
+				};
+			}
+
+			let db;
+
+			// 在页面加载时打开数据库
+			// const [db, setDb] = useState(null);
+			// useEffect(() => {
+			//     openDatabase().then(db => setDb(db));
+			//   }, []);
+			window.onload = function () {
+				openDatabase().then(result => {
+					db = result;
+				});
+			};
+		</script>
+	</head>
+	<body>
+		<h1>IndexedDB Example</h1>
+		<div>
+			<input type="text" id="name" placeholder="Name" />
+			<input type="email" id="email" placeholder="Email" />
+			<input type="number" id="age" placeholder="Age" />
+			<input type="text" id="address" placeholder="Address" />
+			<button onclick="addData(db)">Add Data</button>
+		</div>
+		<div>
+			<input type="number" id="id" placeholder="Enter ID to read" />
+			<button onclick="readData(db)">Read Data</button>
+		</div>
+		<div>
+			<input type="number" id="deleteId" placeholder="Enter ID to delete" />
+			<button onclick="deleteData(db)">Delete Data</button>
+		</div>
+	</body>
+</html>

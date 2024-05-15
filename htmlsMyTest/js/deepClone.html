@@ -14,52 +14,58 @@
 		<h1>JavaScript Execution Context Demo</h1>
 		<p>Check the console for output.</p>
 		<script>
-			function deepClone(target) {
+			function deepClone(obj) {
 				let myMap = new Map();
-				function clone(obj) {
-					if (myMap.has(obj)) {
-						return myMap.get(obj);
+				let clone = function (target) {
+					if (myMap.has(target)) {
+						return myMap.get(target);
 					}
-					strategy = {
-						ObjectOrArray() {
-							let res = new obj.constructor();
-							myMap.set(obj, res);
-							for (let [k, v] of Object.entries(obj)) {
+					let strategy = {
+						ArrayOrObj() {
+							let res = new target.constructor();
+							for (let [k, v] of Object.entries(target)) {
 								res[k] = clone(v);
 							}
+							myMap.set(target, res);
 							return res;
 						},
 						Map() {
 							let res = new Map();
-							obj.forEach((v, k) => {
-								res.set(clone(k), clone(v));
-							});
+							console.log('debug-map', target);
+							for (let key of target.keys()) {
+								res[clone(key)] = clone(target.get(key));
+							}
+							myMap.set(target, res);
 							return res;
 						},
 						Set() {
 							let res = new Set();
-							obj.forEach(v => {
+							for (let v of target) {
 								res.add(clone(v));
-							});
+							}
+							myMap.set(target, res);
 							return res;
 						},
 						Date() {
-							return new Date(obj.valueOf());
+							return new Date(target.valueOf());
 						},
 						Error() {
-							return new Error(obj.message);
+							return new Error(target.message);
 						},
 					};
-					let type = Object.prototype.toString.call(obj);
-					type = type.substring(8, type.length - 1);
-					// console.log(type);
-					if (['Array', 'Object'].includes(type)) {
-						return strategy.ObjectOrArray();
-					} else {
-						return strategy[type] ? strategy[type]() : obj;
+					let type = Object.prototype.toString.call(target);
+					type = type.slice(8, type.length - 1);
+					if (typeof target !== 'Object') {
+						return target;
 					}
-				}
-				return clone(target);
+					if (type === 'Object' || type === 'Array') {
+						return strategy.ArrayOrObj();
+					} else {
+						console.log(type);
+						return strategy[type]();
+					}
+				};
+				return clone(obj);
 			}
 			let map1 = new Map();
 			let set1 = new Set();

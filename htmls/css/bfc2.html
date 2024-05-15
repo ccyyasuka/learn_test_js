@@ -10,15 +10,18 @@
 				float: left;
 			}
 			.aaa {
+				/* overflow: hidden; */
+				/* float: left; */
+			}
+			.bbb {
 				overflow: hidden;
-				float: left;
 			}
 		</style>
 	</head>
 	<body>
 		<!-- 如果没有aaa类，因为rectangle设置了float属性，脱离了文件流，所以container这个div高度会以p为准，不会考虑正方形的高度。aaa类让container这个div变成bfc类型的盒子，这样container下面的元素变成了一个整体，从而高度变成了正方形的高度。
 		 -->
-		<div class="container aaa">
+		<div class="container bbb">
 			<div class="rectangle"></div>
 			<p class="aaa">这是一段文字</p>
 			<!-- 如果没有aaa，那么文字的宽度就会和正方形的区域相重叠，有了aaa可以让宽度不影响其他元素，于是就不会重叠了 -->

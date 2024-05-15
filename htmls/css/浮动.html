@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<style type="text/css">
+			.block-element {
+				background-color: lightblue;
+				/* width: 200px; */
+				height: 100px;
+				margin-bottom: 10px; /* 添加一些底部外边距 */
+			}
+			.inline-block-element {
+				display: inline-block;
+				background-color: lightcoral;
+				width: 100px;
+				height: 100px;
+				margin-right: 5px; /* 添加一些右边外边距 */
+			}
+			.inline-element {
+				background-color: lightgreen;
+				padding: 5px; /* 可以通过内边距增加一些可视空间 */
+			}
+			.container {
+				font-size: 20;
+				background-color: cadetblue;
+			}
+			.float-element {
+				float: left; /* 元素浮动到左边 浮动会将此时的元素飘起来，导致后面的div盒子会上移。*/
+				width: 100px;
+				height: 100px;
+				background-color: lightblue;
+				margin-right: 10px; /* 添加一些右边外边距 */
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="block-element">我是一个块级元素</div>
+		<span class="inline-block-element">元素1</span>
+		<span class="inline-block-element">元素2</span>
+		<span class="inline-element">我是一个行内元素，</span>
+		<span class="inline-element" style="display: block">我也是。</span>
+		<div class="container">
+			<span class="inline-block-element">元素1</span>
+			<span class="inline-block-element">元素2</span>
+		</div>
+		<div class="float-element">浮动元素</div>
+		<p>这段文字将围绕浮动元素显示，展示了浮动的文本环绕效果。</p>
+	</body>
+</html>

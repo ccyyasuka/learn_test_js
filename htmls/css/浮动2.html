@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+			}
+			ul li {
+				/*使列表前无标记*/
+				list-style: none;
+				float: left;
+				width: 200px;
+				height: 100px;
+			}
+			/*这里因为没有单独给每个列表标记，所用我们可以用这个方法，选中li后再指定第几个，切记不能写成 ul:nth-child(1) */
+			li:nth-child(1) {
+				background: red;
+			}
+			li:nth-child(2) {
+				background: yellow;
+			}
+			li:nth-child(3) {
+				background: green;
+			}
+			.text {
+				width: 100px;
+				height: 200px;
+				background: blue;
+			}
+			.clear {
+				clear: both;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<ul class="clear">
+				<li>1</li>
+				<li>2</li>
+				<li>3</li>
+				<div class="clear"></div>
+			</ul>
+			<div class="text">Hello World</div>
+		</div>
+	</body>
+</html>

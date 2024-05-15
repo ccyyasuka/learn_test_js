@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="x-ua-compatible" content="IE=edge, chrome=1" />
+		<style></style>
+	</head>
+
+	<body>
+		<script>
+			task1 = new Promise(resolve => {
+				setTimeout(() => {
+					resolve('Task1');
+				}, 2000);
+			});
+			task2 = new Promise(resolve => {
+				setTimeout(() => {
+					resolve('Task2');
+				}, 1000);
+			});
+			task3 = new Promise(resolve => {
+				setTimeout(() => {
+					resolve('Task3');
+				}, 4000);
+			});
+			task4 = new Promise((resolve, reject) => {
+				setTimeout(() => {
+					reject('Task4');
+				}, 4000);
+			});
+			//执行到这里时，四个计时器就已经启动了
+
+			function executeTasks(tasks) {
+				let index = 0;
+				let allRes = new Array(tasks.length).fill(undefined);
+				for (let i = 0; i < tasks.length; i++) {
+					tasks[i]
+						.then(res => {
+							allRes[i] = res;
+						})
+						.catch(err => {
+							allRes[i] = new Error('error');
+						})
+						.finally(() => {
+							while (index < tasks.length && allRes[index] !== undefined) {
+								console.log(allRes[index]);
+								index++;
+							}
+						});
+				}
+			}
+			tasks = [task1, task2, task3, task4];
+			executeTasks(tasks);
+		</script>
+	</body>
+</html>

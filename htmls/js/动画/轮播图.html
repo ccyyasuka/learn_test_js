@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>简单轮播图</title>
+		<style>
+			.slider {
+				width: 70%;
+				margin: 20px auto;
+				overflow: hidden;
+				position: relative;
+			}
+			.slides {
+				display: flex;
+				transition: transform 0.5s ease;
+			}
+			.slide {
+				width: 100%;
+				flex-shrink: 0;
+				/* 保持它们原有的大小，不会因容器尺寸调整而缩放。 */
+				/* position: relative; */
+			}
+			.slide img {
+				width: 100%;
+				/* display: block; */
+			}
+			.controls {
+				position: absolute;
+				top: 50%;
+				width: 100%;
+				display: flex;
+				justify-content: space-between;
+				transform: translateY(-50%);
+			}
+			.control-left,
+			.control-right {
+				background: rgba(0, 0, 0, 0.5);
+				color: white;
+				padding: 10px;
+				cursor: pointer;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="slider">
+			<div class="slides">
+				<div class="slide"><img src="../../img/huojian.png" alt="Image 1" /></div>
+				<div class="slide"><img src="https://via.placeholder.com/800x400?text=Image+2" alt="Image 2" /></div>
+				<div class="slide"><img src="https://via.placeholder.com/800x400?text=Image+3" alt="Image 3" /></div>
+			</div>
+			<div class="controls">
+				<span class="control-left" onclick="previousSlide()">&#10094;</span>
+				<span class="control-right" onclick="nextSlide()">&#10095;</span>
+			</div>
+		</div>
+
+		<script>
+			let currentSlide = 0;
+			const slides = document.querySelectorAll('.slide');
+			const totalSlides = slides.length;
+			let lastTime = Date.now();
+			let autoSlideTimeout = 3000;
+			function updateSlides(position) {
+				const slideWidth = slides[0].clientWidth;
+				// console.log(position);
+				document.querySelector('.slides').style.transform = `translateX(${-position * slideWidth}px)`;
+			}
+
+			function nextSlide() {
+				currentSlide = (currentSlide + 1) % totalSlides;
+				updateSlides(currentSlide);
+			}
+
+			function previousSlide() {
+				currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+				updateSlides(currentSlide);
+			}
+
+			// Auto slide
+			// setInterval(nextSlide, 3000); // Change slides every 3 seconds
+			function autoSlide() {
+				// 每一帧都得到当前的时间，如果时间差超过3s，就重绘
+				const now = Date.now();
+				const elapsed = now - lastTime;
+
+				if (elapsed >= autoSlideTimeout) {
+					nextSlide();
+					lastTime = now - (elapsed % autoSlideTimeout);
+				}
+
+				requestAnimationFrame(autoSlide);
+			}
+
+			requestAnimationFrame(autoSlide);
+		</script>
+	</body>
+</html>

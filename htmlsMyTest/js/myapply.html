@@ -15,18 +15,43 @@
 		<p>Check the console for output.</p>
 		<script>
 			//测试
-			Function.prototype.myApply = function (context) {
-				if (typeof this !== 'function') throw new Error('not a function');
-				let args = null;
-				let res = null;
+			// Function.prototype.myApply = function (context) {
+			// 	if (typeof this !== 'function') throw new Error('error');
+			// 	if (!context) context = window;
+			// 	let args = arguments?.[1];
+			// 	let fnSymbol = Symbol();
+			// 	context[fnSymbol] = this;
+			// 	let res = null;
+			// 	if (arguments[1]) {
+			// 		res = context[fnSymbol](...args);
+			// 	} else {
+			// 		res = context[fnSymbol]();
+			// 	}
+			// 	delete context[fnSymbol];
+			// 	return res;
+			// };
+			// Function.prototype.myApply = function (obj) {
+			// 	if (typeof this !== 'function') throw new Error('not a function');
+			// 	let args = arguments[1];
+			// 	let func = this;
+			// 	let fSymbol = Symbol();
+			// 	obj[fSymbol] = func;
+			// 	let res;
+			// 	if (arguments[1]) {
+			// 		res = obj[fSymbol](...args);
+			// 	} else {
+			// 		res = obj[fSymbol]();
+			// 	}
+			// 	delete obj[fSymbol];
+			// 	return res;
+			// };
+			Function.prototype.myApply = function (context, params) {
+				let args = params ? params : [];
+				let func = this;
 				let funcSym = Symbol();
-				context[funcSym] = this;
-				if (arguments[1]) {
-					args = arguments[1];
-					res = context[funcSym](...args); //注意传到函数中时要解包
-				} else {
-					res = context[funcSym]();
-				}
+				context[funcSym] = func;
+
+				let res = params ? context[funcSym](...args) : context[funcSym]();
 				delete context[funcSym];
 				return res;
 			};

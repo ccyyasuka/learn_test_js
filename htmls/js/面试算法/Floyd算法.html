@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="x-ua-compatible" content="IE=edge, chrome=1" />
+		<title>debounce</title>
+		<style></style>
+	</head>
+
+	<body>
+		<script>
+			function floydWarshall(dist) {
+				const numVertices = dist.length;
+				// 创建距离数组的副本，以防更改输入矩阵
+
+				// 三重循环更新所有顶点之间的最短路径
+				for (let k = 0; k < numVertices; k++) {
+					for (let i = 0; i < numVertices; i++) {
+						for (let j = 0; j < numVertices; j++) {
+							// 如果通过顶点k的路径更短，则更新dist[i][j]
+							if (dist[i][k] + dist[k][j] < dist[i][j]) {
+								dist[i][j] = dist[i][k] + dist[k][j];
+							}
+						}
+					}
+				}
+
+				return dist;
+			}
+			// 示例矩阵初始化
+			const INF = Infinity;
+			const graph = [
+				[0, 5, INF, 10],
+				[INF, 0, 3, INF],
+				[INF, INF, 0, 1],
+				[INF, INF, INF, 0],
+			];
+
+			// 调用 Floyd-Warshall 算法
+			const shortestPaths = floydWarshall(graph);
+
+			// 输出结果矩阵
+			console.log('The shortest paths matrix is:');
+			console.log(shortestPaths);
+		</script>
+	</body>
+</html>

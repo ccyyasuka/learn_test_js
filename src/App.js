@@ -38,7 +38,7 @@ const Counter = () => {
 	return createElement('h1', { onclick: () => setState(prev => prev + 1) }, state);
 };
 
-const element = createElement(Counter);
+const element = createElement(Counter); //用函数式组件生成element时，没有传入props和childrens
 // console.log(element);
 // render(element, container);
 myRender(element, container);

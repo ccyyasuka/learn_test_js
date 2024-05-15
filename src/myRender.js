@@ -40,9 +40,10 @@ function myRender(element, container) {
 		props: {
 			children: [element],
 		},
-		alternate: currentRoot, //备份，存储上次渲染的wipRoot的引用
+		alternate: currentRoot, //备份，存储上次渲染的wipRoot的引用，初始的currentRoot为null
 		//diff算法中每一个fiber都基于alternate取到上一个fiber
 	};
+
 	nextUnitOfWork = wipRoot;
 	deletions = [];
 }
@@ -55,7 +56,7 @@ function createDom(fiber) {
 		.forEach(key => (dom[key] = fiber.props[key])); //把属性依次赋值给dom
 	return dom;
 }
-//commit阶段 异步渲染构建fiber树结束，同步commit开始
+//commit阶段 异步构建fiber树结束，同步commit开始
 function commitRoot() {
 	deletions.forEach(item => commitWork(item)); //删除所有要删除的fiber
 	commitWork(wipRoot.child);
@@ -68,7 +69,7 @@ function commitWork(fiber) {
 	if (!fiber) {
 		return;
 	}
-	// 如果当前fiber是函数的fiber，那就用commitWork(fiber.child)再往下一步到当前fiber的child，
+	// 如果当前fiber是函数的fiber，那当前fiber就没有dom，就用commitWork(fiber.child)再往下一步到当前fiber的child，直到找到有dom的fiber，
 	// child会寻找最近的父DOM节点，大概率是函数fiber的parent，那函数fiber的parent的dom挂住函数fiber的child的dom即可
 	//函数式组件没有自己的dom，所以需要循环向上查找，找到最近的存在dom的fiber节点，针对节点更新要向上查找
 	let domParentFiber = fiber.parent;
@@ -84,8 +85,10 @@ function commitWork(fiber) {
 		commitDeletion(fiber, parentDom);
 		//非函数式组件可以只用这一句话
 		// parentDom.removeChild(fiber.dom);
+		// 删除组件时，fiber还在老树上
 	} else if (fiber.effectTag === 'UPDATE' && fiber.dom) {
 		updateDom(fiber.dom, fiber.alternate.props, fiber.props);
+		// 这里是通过dom[key] = xxx 直接设置属性
 	}
 	// parentDom.append(fiber.dom); //把当前dom挂在parent dom上，从而真的显示在屏幕上,
 	// 有了这句代码，diff会变卡顿，为什么？？？
@@ -98,7 +101,7 @@ function commitDeletion(fiber, domParent) {
 		domParent.removeChild(fiber.dom);
 	} else {
 		//递归向下查找，子fiber的dom是挂在domParent的
-		commitDeletion(fiber.child, domParent);
+		commitDeletion(fiber.child);
 	}
 }
 function updateDom(dom, prevProps, nextProps) {
@@ -123,6 +126,7 @@ function updateDom(dom, prevProps, nextProps) {
 		.filter(key => !(key in nextProps) || prevProps[key] !== nextProps[key])
 		.forEach(key => {
 			const eventType = key.toLowerCase().substring(2);
+			// removeEventListener(“MouseEnter”, function)
 			dom.removeEventListener(eventType, prevProps[key]);
 		});
 	//添加已经没有的或者发生变化的事件处理函数
@@ -192,22 +196,25 @@ function updateDom(dom, prevProps, nextProps) {
 // 		index += 1;
 // 	}
 // }
-
+// Fiber树：当更新复杂组件的最上层组件时，调用栈会很长，如果在进行复杂的操作时，就可能长时间阻塞主线程，带来不好的用户体验，
+// Fiber 本质上是一个虚拟的堆栈帧，新的调度器会按照优先级自由调度这些帧，从而将之前的同步渲染改成了异步渲染，在不影响体验的情况下去分段计算更新。
 function reconcileChildren(wipFiber, elements) {
-	// 用父fiber和子element构建子fiber和fiber树
+	// 用父fiber和子element构建、协调子fiber和fiber树
 	// debugger;
 	let index = 0;
 	// 如果有alternate，就返回它的child，没有，就返回undefined
 	// 这个alternate最先是在setState中引入的，再在reconcileChildren中通过alternate: oldFiber遍历引入
 	let oldFiber = wipFiber.alternate && wipFiber.alternate.child;
+	// 千万注意，这里是wipFiber.alternate.child
+
+	//函数式组件的fiber只是dom为null，在构建fiber树时并没有其他差别。
 
 	let prevSibling = null;
 
-	// 注意这里是或
+	// 注意这里是或，因为第一次渲染时还没有老树，oldFiber为null
 	while (index < elements.length || oldFiber) {
 		const element = elements[index];
 		const sameType = oldFiber && element && oldFiber.type === element.type;
-
 		let newFiber = null;
 
 		if (sameType) {
@@ -218,22 +225,21 @@ function reconcileChildren(wipFiber, elements) {
 				// 继承dom
 				dom: oldFiber.dom,
 				parent: wipFiber,
-				alternate: oldFiber, //oldFiber是wipFiber的alternate的child，是上一次渲染对应位置的fiber
+				alternate: oldFiber, //oldFiber是wipFiber的alternate的child，是上一次渲染对应位置的fiber，wipFiber是新树
 				effectTag: 'UPDATE',
 			};
-		}
-		if (element && !sameType) {
+		} else if (element && !sameType) {
+			//oldFiber有但是oldFiber和新fiber的type不一样，或者oldFiber没有
 			// 新建
 			newFiber = {
-				type: element.type,
+				type: element.type, //这里就可能是一个函数
 				props: element.props,
-				dom: null,
+				dom: null, //当nextUnitOfWork指向这个Fiber时，updateHostComponent(fiber)中用createDom(fiber)创建dom
 				parent: wipFiber,
-				alternate: null,
+				alternate: null, //和上一次渲染类型相同时才用alternate，否则不用
 				effectTag: 'PLACEMENT',
 			};
-		}
-		if (oldFiber && !sameType) {
+		} else if (oldFiber && !sameType) {
 			// 删除
 			oldFiber.effectTag = 'DELETION';
 			deletions.push(oldFiber);
@@ -321,8 +327,9 @@ function performUnitOfWork(fiber) {
 		return fiber.child;
 	}
 	let nextFiber = fiber;
-	//当前fiber渲染完了，且当前fiber子元素，从这里去找到fiber的父节点的兄弟节点，
+	//当前fiber构建fiber树完了，且当前fiber没有子元素，从这里去找到fiber的父节点的兄弟节点，
 	//如果找不到就一路向上，直到root_fiber的父节点也就是null
+	// 这些步骤仍然是在构建fiber树
 	while (nextFiber) {
 		if (nextFiber.sibling) {
 			return nextFiber.sibling;
@@ -335,27 +342,33 @@ let wipFiber = null;
 let hookIndex = 0;
 //处理函数式组件
 function updateFunctionComponent(fiber) {
+	// 重点是在更新自己的同时需要去协调子节点 jueJin
+
 	// 函数式组件没有dom，所以没有这一步
 	//  if (!fiber.dom) {
 	// 	fiber.dom = createDOM(fiber);
 	// }
-	debugger;
+	// debugger;
 	wipFiber = fiber;
 	hookIndex = 0;
-	wipFiber.hooks = []; //储存当前组件注册的所有hook，fiber同时也有了hooks
 
+	//储存当前组件注册的所有hook，fiber同时也有了hooks，此时还在构建树的阶段，hooks为空，
+	// 在const children = [fiber.type(fiber.props)]这一步;同时就执行了函数式组件里面的useState
+	wipFiber.hooks = [];
 	//函数式组件的children是通过运行而来的
 	//也就是函数返回的jsx是函数式组件的孩子，函数式组件没有自己的dom节点,返回的jsx是他孩子的dom
-	debugger;
+	// debugger;
 	console.log(fiber);
-	const children = [fiber.type(fiber.props)]; //新建element
+	const children = [fiber.type(fiber.props)]; //执行函数，得到函数返回的element，在这里才执行useState
 	reconcileChildren(fiber, children);
 }
 
+// 在updateFunctionComponent阶段才执行useState
 export function useState(init) {
 	// hook用来连接前后两次渲染，必须有全局变量来记录上一次渲染的信息，也就是wipFiber
 	// 全局的wipFiber来自新建函数式组件的element时，wipFiber已经被置为函数式组件的fiber，
 	// wipFiber.alternate.hooks里面保存了上一次的state和action
+	debugger;
 	const oldHook = wipFiber.alternate?.hooks[hookIndex];
 	const hook = {
 		state: oldHook ? oldHook.state : init,
@@ -381,7 +394,8 @@ export function useState(init) {
 		nextUnitOfWork = wipRoot;
 		deletions = [];
 	};
-	//一个函数式组件对应若干个useState，一个useState有一个hook
+	// 上面是构建当前的hook, wipFiber.hooks在updateFunctionComponent本就有hook了
+	// 一个函数式组件对应若干个useState，一个useState有一个hook，一个hook有若干个action，因为一个函数式组件中可以有好几个setState
 	wipFiber.hooks.push(hook);
 	hookIndex += 1;
 	return [hook.state, setState];
@@ -389,6 +403,7 @@ export function useState(init) {
 
 //处理非函数式组件
 function updateHostComponent(fiber) {
+	// 重点是在更新自己的同时需要去协调子节点 jueJin
 	if (!fiber.dom) {
 		fiber.dom = createDom(fiber);
 	}
@@ -400,7 +415,7 @@ function updateHostComponent(fiber) {
 }
 
 let nextUnitOfWork = null; //是否有下一个任务
-let wipRoot = null;
+let wipRoot = null; //当前正在构建中的fiber树
 //第一次请求
 requestIdleCallback(WorkLoop);
 let currentRoot = null; //进行diff算法时存储上一棵树

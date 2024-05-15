@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>JavaScript Execution Context Demo</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+			}
+		</style>
+	</head>
+	<body>
+		<script>
+			// 使用 Promise.myAll
+			Promise.myAll = function (promises) {
+				return new Promise((resolve, reject) => {
+					const results = [];
+					let completed = 0;
+
+					if (promises.length === 0) resolve(results);
+
+					promises.forEach((promise, index) => {
+						Promise.resolve(promise)
+							.then(value => {
+								results[index] = value;
+								completed += 1;
+
+								if (completed === promises.length) {
+									resolve(results);
+								}
+							})
+							.catch(reject); // 直接使用 reject，若任一 promise 失败则 Promise.all 失败
+					});
+				});
+			};
+
+			// 测试 Promise.myAll
+			Promise.myAll([promise1, promise2, promise4])
+				.then(values => {
+					console.log('Promise.myAll resolved values:', values);
+				})
+				.catch(error => {
+					console.log('Promise.myAll was rejected with error:', error);
+				});
+
+			Promise.myAll([promise3, promise1, promise2])
+				.then(values => {
+					console.log('Promise.myAll resolved values:', values);
+				})
+				.catch(error => {
+					console.log('Promise.myAll was rejected with error:', error);
+				});
+
+			// 使用 Promise.myRace
+			Promise.myRace = function (promises) {
+				return new Promise((resolve, reject) => {
+					promises.forEach(promise => {
+						Promise.resolve(promise).then(resolve).catch(reject);
+					});
+				});
+			};
+
+			// 测试 Promise.myRace
+			Promise.myRace([promise1, promise2, promise4])
+				.then(value => {
+					console.log('Promise.myRace resolved with value:', value);
+				})
+				.catch(error => {
+					console.log('Promise.myRace was rejected with error:', error);
+				});
+
+			Promise.myRace([promise3, promise1, promise2])
+				.then(value => {
+					console.log('Promise.myRace resolved with value:', value);
+				})
+				.catch(error => {
+					console.log('Promise.myRace was rejected with error:', error);
+				});
+		</script>
+	</body>
+</html>

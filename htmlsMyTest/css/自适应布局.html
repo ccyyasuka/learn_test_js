@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Box Model Comparison</title>
+		<style type="text/css">
+			#container {
+				display: flex;
+				flex-direction: column;
+				height: 100vh; /* 使容器填满整个视口高度 */
+			}
+
+			/* 页眉和页脚 */
+			#header,
+			#footer {
+				text-align: center;
+				padding: 10px;
+				background: lightgrey;
+				height: 30px;
+			}
+
+			/* 中心区域设置为flex容器，以容纳中央内容、左侧和右侧 */
+			#center {
+				flex: 1; /* 伸缩以填满剩余空间 */
+				display: flex;
+				flex-direction: row; /* 水平布局 */
+			}
+
+			/* 中央内容区设置 */
+			#center-wrap {
+				flex: 1; /* 伸缩以填满剩余空间 */
+				text-align: center;
+				padding: 10px;
+				background: lightblue;
+			}
+
+			/* 左侧和右侧设置 */
+			#left,
+			#right {
+				width: 30px;
+				text-align: center;
+				padding: 10px;
+				background: lightcoral;
+			}
+		</style>
+	</head>
+	<div id="container">
+		<div id="header" class="float">header</div>
+		<div id="center" class="float">
+			<div id="left" class="float">left</div>
+			<div id="center-wrap">center</div>
+			<div id="right" class="float">right</div>
+		</div>
+		<div id="footer" class="float">footer</div>
+	</div>
+
+	<body></body>
+</html>

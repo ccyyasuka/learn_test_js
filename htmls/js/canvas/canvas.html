@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Canvas绘图示例</title>
+	</head>
+	<body>
+		<canvas id="myCanvas" width="600" height="700" style="border: 1px solid #000000">
+			您的浏览器不支持canvas元素。
+		</canvas>
+
+		<canvas id="myCanvas2" width="600" height="700" style="border: 1px solid #000000">
+			您的浏览器不支持canvas元素。
+		</canvas>
+
+		<canvas id="canvasWord" height="600" width="700">您的浏览器不支持canvas元素。</canvas>
+
+		<script>
+			var canvas = document.getElementById('myCanvas');
+
+			// 获取绘图上下文
+			var ctx = canvas.getContext('2d');
+
+			// 设置填充颜色为蓝色
+			ctx.fillStyle = 'yellow';
+
+			// 绘制一个填充的矩形
+			// 参数分别是矩形的x坐标、y坐标、宽度和高度
+			ctx.fillRect(10, 10, 150, 75);
+			// 确定起始点
+			ctx.beginPath();
+			ctx.moveTo(20, 20);
+			// 确定中间定位点
+			ctx.lineTo(40, 70);
+			ctx.lineTo(40, 90);
+			ctx.lineTo(70, 70);
+			ctx.stroke();
+			ctx.closePath();
+
+			// beginPath是重新开始绘制的意思 如果没有beginPath，第二次ctx.stroke会画两条线，把之前的线覆盖住
+			ctx.beginPath();
+			// 确定第二次的起始点
+			ctx.moveTo(110, 20);
+			// 确定中间定位点
+			ctx.lineTo(140, 70);
+			ctx.lineTo(140, 90);
+			ctx.lineTo(170, 70);
+			// 在ctx.stroke前设定画线的属性
+			// 线宽
+			ctx.lineWidth = 3;
+			// 线透明度
+			ctx.globalAlpha = 0.4;
+			ctx.strokeStyle = 'red';
+			// 开始划线
+			ctx.stroke();
+			ctx.closePath();
+
+			ctx.beginPath();
+			ctx.moveTo(150, 500);
+			ctx.lineTo(250, 400);
+			ctx.lineTo(350, 500);
+			ctx.lineTo(450, 400);
+			ctx.lineTo(550, 500);
+			ctx.lineWidth = 30;
+			ctx.strokeStyle = '#a37400'; // 设置线段颜色
+			ctx.lineCap = 'butt'; // 设置线帽为默认形式
+			ctx.lineJoin = 'bevel'; // 设置线段连接处为平直的形式
+			ctx.stroke();
+			ctx.beginPath();
+			ctx.arc(350, 300, 300, 0, [Math.PI / 180] * 360);
+			ctx.globalAlpha = 0.3; // 设置圆的透明度为0.3
+			ctx.fillStyle = 'skyblue';
+			ctx.fill();
+
+			ctx.beginPath();
+			ctx.moveTo(200, 200);
+			ctx.lineTo(500, 200);
+			ctx.lineTo(500, 500);
+			ctx.lineTo(200, 200);
+			// 在ctx.stroke前面加一个ctx.closePath,会先添加一条从终点到起点闭合的线，然后在ctx.stroke()的时候画线，描边，会更平滑
+			ctx.closePath();
+			ctx.strokeStyle = 'skyblue';
+			ctx.lineWidth = 20;
+			ctx.stroke();
+
+			// 填充三角形
+			// 设置三角形的三个顶点
+			ctx.beginPath();
+			ctx.moveTo(100, 50); // 顶点
+			ctx.lineTo(150, 150); // 右下角
+			ctx.lineTo(50, 150); // 左下角
+			ctx.closePath(); // 关闭路径
+			// 设置填充颜色为黄色并填充三角形
+			ctx.fillStyle = 'yellow';
+			ctx.fill();
+
+			// 填充矩形
+			const canvas2 = document.getElementById('myCanvas2');
+			const ctx2 = canvas2.getContext('2d');
+			ctx2.beginPath();
+			ctx2.fillStyle = 'skyblue'; // 填充颜色一定要写在生成矩形（fillRect()）之前，否则颜色不生效
+			ctx2.fillRect(200, 150, 300, 300);
+			ctx2.closePath();
+
+			ctx2.beginPath();
+			ctx2.moveTo(20, 20);
+			ctx2.lineTo(20, 40);
+			ctx2.lineTo(40, 40);
+			ctx2.lineTo(40, 20);
+			ctx2.closePath();
+			ctx2.fillStyle = 'red';
+			ctx2.fill();
+
+			const canvas3 = document.getElementById('canvasWord');
+			const ctx3 = canvas3.getContext('2d');
+			ctx3.font = '40px Verdana'; // 为了展示方便，这里为文本添加了样式，使用 .font 设置样式会在后边讲到
+			// 注意，180, 320是文本左下角的坐标，400是文字的最大宽度，如果文字宽度超过400，就压缩
+			ctx3.textAlign = 'center'; //水平方向居中
+			ctx3.textBaseline = 'middle'; //竖直方向居中
+			ctx3.strokeText('Hello Canvas!', 350, 300, 400);
+			ctx3.beginPath();
+			ctx3.moveTo(350, 0);
+			ctx3.lineTo(350, 600);
+			ctx3.setLineDash([10]);
+			ctx3.globalAlpha = 0.5;
+			ctx3.stroke();
+			ctx3.beginPath();
+			ctx3.moveTo(0, 300);
+			ctx3.lineTo(700, 300);
+			ctx3.stroke();
+		</script>
+	</body>
+</html>

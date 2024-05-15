@@ -34,7 +34,10 @@
 					var context = this;
 					// 如果在超时时间内发生了某个事件，想要取消执行之前设置的方法，
 					// 可以使用 clearTimeout 清理掉之前设置的 timeout 对象。
-					if (timeout) clearTimeout(timeout);
+					if (timeout) {
+						clearTimeout(timeout);
+						//后面的callNow依赖于timeout，所以此处timeout不能置null，除此之外各处clearTimeout和timeout=null都可以同时使用
+					}
 					// setTimeout 函数创建一个新的定时器，定时器延迟 wait 毫秒执行匿名函数function，
 					// 也就是执行 func 函数，因为使用了apply
 					// setTimeout 的返回值（定时器标识）赋给之前声明的 timeout 变量，
@@ -83,6 +86,9 @@
 
 			// container.onmousemove = getUserAction;
 			var setUseAction = debounce(getUserAction, 1000, true);
+			// 这个调用会立即执行，并且如果在1秒内没有再次调用，它就是唯一的调用
+			let result = setUseAction();
+			console.log('Returned:', result);
 			container.onmousemove = setUseAction;
 			document.getElementById('button').addEventListener('click', function () {
 				setUseAction.cancel();

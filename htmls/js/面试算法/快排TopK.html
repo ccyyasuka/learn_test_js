@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="x-ua-compatible" content="IE=edge, chrome=1" />
+		<title>debounce</title>
+		<style></style>
+	</head>
+
+	<body>
+		<script>
+			// let iniArray = [3, 2, 1, 3, 2, 6, 3, 5, 1, 7, 8, 4, 5, 2, 3];
+			let iniArray = [1, 2, 3, 4, 5, 6, 7];
+
+			function select(arr, left, right, k) {
+				if (left === right) {
+					return arr[left];
+				}
+				let flag = arr[left];
+				let l = left;
+				let r = right;
+				while (l < r) {
+					while (l < r && arr[r] >= flag) {
+						r--;
+					}
+					arr[l] = arr[r]; // 将找到的小元素移动到左侧
+
+					// 寻找左侧大于pivot的元素
+					while (l < r && arr[l] <= flag) {
+						l++;
+					}
+					arr[r] = arr[l]; // 将找到的大元素移动到右侧
+				}
+				arr[l] = flag;
+				if (l === k) {
+					return flag;
+				}
+				if (l < k) {
+					return select(arr, l + 1, right, k);
+				} else {
+					return select(arr, left, r - 1, k);
+				}
+			}
+			function quickSelect(array, k) {
+				let res = select(array, 0, array.length - 1, array.length - k);
+				return res;
+			}
+			console.log(quickSelect(iniArray, 3));
+		</script>
+	</body>
+</html>

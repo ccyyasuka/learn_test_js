@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<style type="text/css">
+			.flex-container {
+				display: flex;
+				background-color: lightgrey;
+				height: 600px;
+				width: 600px;
+				justify-content: space-between;
+			}
+			.flex-item {
+				display: flex;
+				background-color: cornflowerblue;
+				color: white;
+				margin: 10px;
+				padding: 20px;
+				font-size: 30px;
+				height: 20px;
+				width: 20px;
+				justify-content: center;
+				align-items: center;
+				/* 内容在主轴上对齐，包括内部文字 */
+				border-radius: 50%;
+				position: relative;
+			}
+			/* flex布局下，relative定位、transform:translate定位都起效果，float不起效果 */
+			.item1 {
+				position: relative;
+			}
+			.item2 {
+				align-self: flex-end;
+				left: -130px;
+				bottom: 30px;
+			}
+			.item4 {
+				align-self: flex-end;
+				transform: translateX(130px);
+			}
+			.item3 {
+				align-self: center;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="flex-container">
+			<div class="flex-item item1">1</div>
+			<div class="flex-item item2">2</div>
+			<div class="flex-item item3">3</div>
+			<div class="flex-item item4">4</div>
+			<div class="flex-item item5">5</div>
+		</div>
+	</body>
+</html>

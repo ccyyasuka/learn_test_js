@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>JSONP Demo</title>
+	</head>
+	<body>
+		<div id="jsonp"></div>
+		<script>
+			function handleResponse(data) {
+				console.log('Received:', data);
+			}
+
+			const script = document.createElement('script');
+			script.src = 'http://localhost:3000/jsonp?callback=handleResponse';
+			document.getElementById('jsonp').appendChild(script);
+		</script>
+	</body>
+</html>
+<!-- 
+    后端：
+    const express = require('express');
+const app = express();
+
+app.get('/jsonp', (req, res) => {
+    const { callback } = req.query;
+    const data = {
+        message: "Hello JSONP",
+        timestamp: new Date()
+    };
+    res.type('text/javascript');
+    res.send(`${callback}(${JSON.stringify(data)})`);
+});
+
+app.listen(3000, () => {
+    console.log('Server listening on port 3000');
+}); 
+
+这段代码创建了一个简单的服务器，监听在 3000 端口。当接收到 /jsonp 路径的请求时，它会读取请求中的 callback 参数，并使用这个参数将 JSON 数据包装成一个 JavaScript 函数调用。
+
+-->

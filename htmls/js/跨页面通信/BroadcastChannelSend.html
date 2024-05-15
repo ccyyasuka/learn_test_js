@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>发送消息</title>
+	</head>
+	<body>
+		<h1>发送消息页面</h1>
+		<button id="sendButton">发送消息</button>
+		<script>
+			// 创建一个新的 Broadcast Channel
+			const channel = new BroadcastChannel('demo_channel');
+
+			// 当按钮被点击时，发送一个消息
+			document.getElementById('sendButton').onclick = () => {
+				const message = '你好，世界！';
+				channel.postMessage(message);
+				console.log(`消息 "${message}" 已发送。`);
+			};
+		</script>
+	</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="x-ua-compatible" content="IE=edge, chrome=1" />
+		<style></style>
+	</head>
+
+	<body>
+		<script>
+			// function TreeNode(value) {
+			// 	this.val = value;
+			// 	this.left = null;
+			// 	this.right = null;
+			// }
+			// function Tree(node) {
+			// 	this.root = node;
+			// }
+			// let n1 = new TreeNode(3);
+			// let n2 = new TreeNode(5);
+			// n1.left = n2;
+			// let t = new Tree(n1);
+			// console.log(t.root.val);
+			// console.log(t.root.left.val);
+			class Node {
+				constructor(value) {
+					this.val = value;
+					this.left = null;
+					this.right = null;
+				}
+			}
+			class binaryTree {
+				constructor(node) {
+					this.root = node;
+				}
+				addLeft(node) {
+					//class中的函数不用写function
+					this.root.left = node;
+				}
+			}
+			const node1 = new Node(3);
+			console.log(node1.val);
+		</script>
+	</body>
+</html>

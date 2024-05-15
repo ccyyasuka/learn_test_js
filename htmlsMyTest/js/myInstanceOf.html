@@ -8,15 +8,31 @@
 	</head>
 	<body>
 		<script>
-			function myInstanceof(instance, cla) {
-				if (typeof instance !== 'object' || instance === null) return false;
-				if (typeof cla !== 'function') {
-					throw new Error('not a function');
+			// function myInstanceof(instance, cla) {
+			// 	if (typeof instance !== 'object' || instance === null) return false;
+			// 	if (typeof cla !== 'function') {
+			// 		throw new Error('not a function');
+			// 	}
+			// 	proto = Object.getPrototypeOf(instance);
+			// 	while (proto) {
+			// 		if (proto === cla.prototype) return true;
+			// 		proto = Object.getPrototypeOf(proto);
+			// 	}
+			// 	return false;
+			// }
+			function myInstanceof(obj, func) {
+				if (typeof func !== 'function') {
+					throw new Error('error');
 				}
-				proto = Object.getPrototypeOf(instance);
-				while (proto) {
-					if (proto === cla.prototype) return true;
-					proto = Object.getPrototypeOf(proto);
+				if (typeof obj !== 'object' || typeof obj === 'null') {
+					return false;
+				}
+				let pro = obj.__proto__;
+				while (pro) {
+					if (pro === func.prototype) {
+						return true;
+					}
+					pro = pro.__proto__;
 				}
 				return false;
 			}

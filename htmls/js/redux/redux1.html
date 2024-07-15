@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="x-ua-compatible" content="IE=edge, chrome=1" />
+		<style></style>
+	</head>
+
+	<body>
+		<script>
+
+      const applyMiddleware = function (...middlewares) {
+        /*返回一个重写createStore的方法*/
+        return function rewriteCreateStoreFunc(oldCreateStore) {
+          /*返回重写后新的 createStore*/
+          return function newCreateStore(reducer, initState) {
+            /*1. 生成store*/
+            const store = oldCreateStore(reducer, initState);
+            /*给每个 middleware 传下store，相当于 const logger = loggerMiddleware(store);*/
+            /* const chain = [exception, time, logger]*/
+            const chain = middlewares.map(middleware => middleware(store));
+            let dispatch = store.dispatch;
+            /* 实现 exception(time((logger(dispatch))))*/
+            chain.reverse().map(middleware => {
+              dispatch = middleware(dispatch);
+            });
+
+            /*2. 重写 dispatch*/
+            store.dispatch = dispatch;
+            return store;
+          }
+        }
+      }
+
+
+      // reducer就是计划，接受老的state和要执行的动作，返回新的state
+      // 下面两个reducer分别管理counter和info的状态，在combine reducer合并
+      // let initState = {
+      //   counter:{
+      //     count:0,
+      //   },
+      //   info: {
+      //     name: 'aaa',
+      //     description: '旧介绍'
+      //   }
+      // }
+      let counterState={
+        count:0
+      }
+      function counterReducer(state, action) {
+        if(state===undefined){
+         state=counterState
+        }
+        // 此处的state是iniState.counter
+        switch (action.type) {
+          case 'INCREMENT':
+            return {
+              count:state.count+1
+            }
+          case 'DECREMENT':
+            return {
+              count:state.count-1
+            }
+          default:
+            return state;
+        }
+      }
+      let infoState={
+          name: 'aaa',
+          description: '旧介绍'
+        }
+      function infoReducer(state, action) {
+        if(state===undefined){
+          state=infoState
+        }
+        // 变化信息是在action中传的
+        switch (action.type) {
+          case 'setName':
+            return {
+              ...state,
+              name: action.name
+            }
+          case 'setDesc':
+            return {
+              ...state,
+              description: action.description
+            }
+          default:
+            return state;
+        }
+      }
+      function combineReducer(reducers){
+        const reducerKeys=Object.keys(reducers)
+        console.log(reducerKeys)
+        // combineReducer会返回一个新的reducer函数，接收总的state和action,返回新的总的state
+        const res=function(state={},action){
+          // 待生成的新state
+          const nextState={}
+          for(let i=0;i<reducerKeys.length;i++){
+            const curKey=reducerKeys[i]
+            const curReducer=reducers[curKey]
+            const curState=state[curKey]
+            const newState=curReducer(curState,action)
+            nextState[curKey]=newState
+          }
+          // console.log(reducerKeys)
+          return nextState
+        }
+        return res
+      }
+			// class createStore{
+      //   constructor(reducer,iniState){
+      //     // debugger
+      //     this.state=iniState
+      //     this.listeners=[]
+      //     this.reducer=reducer
+      //     this.dispatch({type:Symbol()})
+      //   }
+      //   // 注册state发生变化时自动触发的事件
+      //   subscribe(func) {
+      //     this.listeners.push(func)
+      //   }
+      //   // 接收变化，进行状态改变和事件触发
+      //   dispatch(action){
+      //     debugger
+      //     this.state = this.reducer(this.state, action)
+      //     this.listeners.forEach(
+      //       (listener) => {
+      //         listener()
+      //       }
+      //     )
+      //   }
+      //   getState(){
+      //     return this.state
+      //   }
+      // }
+      function createStore(reducer, initState, rewriteCreateStoreFunc) {
+        /*如果有 rewriteCreateStoreFunc，那就采用新的 createStore */
+        if(rewriteCreateStoreFunc){
+          const newCreateStore =  rewriteCreateStoreFunc(createStore);
+          return newCreateStore(reducer, initState);
+        }
+        let state = initState;
+        let listeners = [];
+
+        function subscribe(listener) {
+          listeners.push(listener);
+        }
+
+        function dispatch(action) {
+          state = reducer(state, action);
+          for (let i = 0; i < listeners.length; i++) {
+            const listener = listeners[i];
+            listener();
+          }
+        }
+
+        function getState() {
+          return state;
+        }
+
+        dispatch({ type: Symbol() });
+
+        return {
+          subscribe,
+          dispatch,
+          getState
+        }
+      }
+
+
+
+
+      // 中间件需求：在改变状态时记录一下
+      // 单个中间件处理逻辑如下，本质就是改写dispatch函数
+      // const next = store.dispatch;
+      // store.dispatch=(action)=>{
+      //   console.log("ini State",store.getState())
+      //   console.log("action",action)
+      //   next(action)
+      //   console.log("new State",store.getState())
+      // }
+      // 有若干个中间件该怎么办，不断扩容dispatch函数太不优雅了
+      //  设定日志中间件
+      const loggerMiddleware = (store)=> (next)=>(action) => {
+        console.log('this state', store.getState());
+        console.log('action', action);
+        next(action);
+        console.log('next state', store.getState());
+      }
+      // 设定记录异常中间件，为了避免写死loggerMiddleware，让loggerMiddleware也变成参数传进来
+      // const exceptionMiddleware = (action) => {
+      //   try {
+      //     /*next(action)*/
+      //     loggerMiddleware(action);
+      //   } catch (err) {
+      //     console.error('错误报告: ', err)
+      //   }
+      // }
+      const exceptionMiddleware = (store)=> (next) => (action) => {
+        try {
+          /*loggerMiddleware(action);*/
+          next(action);
+        } catch (err) {
+          console.error('错误报告: ', err)
+        }
+      }
+      const timeMiddleware = (store) => (next) => (action) => {
+        console.log('time', new Date().getTime());
+        next(action);
+      }
+
+
+
+
+      // reducer的key应该和state的key保持一致
+      const reducer=combineReducer({counter:counterReducer,info:infoReducer})
+      // const store=new createStore(reducer, initState)
+      /**
+       * 注意：我们没有传 initState 进去，因为初始化的时候会执行 dispatch({ type: Symbol() });;
+       * 触发 state = reducer(state, action)
+       * 因为 state 为 undefined，action.type 为不匹配任何计划中 type 的值，所以会返回 reducer 中设置的默认值，完成初始化
+      * */
+
+      const rewriteCreateStoreFunc = applyMiddleware(exceptionMiddleware, timeMiddleware, loggerMiddleware);
+      const store = createStore(reducer, undefined, rewriteCreateStoreFunc);
+      store.subscribe(()=>{
+        const state=store.getState()
+        console.log("接收到了新状态",state.counter.count,state.info.name,state.info.description)
+      })
+
+
+      // 👇下面是复杂用法
+      // const next = store.dispatch;
+      // const logger = loggerMiddleware(store);
+      // const exception = exceptionMiddleware(store);
+      // const timeLogger=timeMiddleware(store)
+      // store.dispatch = exception(timeLogger(logger(next)));
+
+      // 用户只看到三个中间件就够了，👆这些行为都可以封装起来
+
+
+
+      // action的结构是{type:"行动类型", 其余信息}
+      store.dispatch({
+        type:'INCREMENT',
+      })
+      store.dispatch({
+        type:'INCREMENT',
+      })
+      store.dispatch({
+        type:'setName',
+        name:'新名字111'
+      })
+      store.dispatch({
+        type:'setName',
+        des:'新名字111'
+      })
+      store.dispatch({
+        type:'setDesc',
+        description:'新介绍111'
+      })
+		</script>
+	</body>
+</html>

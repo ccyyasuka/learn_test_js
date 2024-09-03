@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>JavaScript Execution Context Demo</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+			}
+		</style>
+	</head>
+	<body>
+		<script>
+      // 编写一个函数，该函数用于 批量请求 传入的 urls，每请求完成 一个 url 后执行一次传入的 callback 函数，该函数接受参数 concurrentNum 用于控制请求的并发数，当所有请求处理完
+      // 成后，执行传入的 done 函数。
+      // function requestLimiter(urls = [],  concurrentNum = 2, callback, done) {
+      // }
+      // 如：输入 10个 urls ，max =2。 每次最多并行请求 2，在未完成请求的时候，network 中始终都是 2。
+
+
+      // 写法1
+
+			function mockFetch(url){
+        return new Promise((resolve)=>{
+          setTimeout(()=>{resolve(url)},2000+Math.random()*2000)
+        })
+      }
+      // function requestLimiter(urls = [],  concurrentNum = 2, callback, done) {
+      //   const total=urls.length
+      //   let curIndex=0
+      //   let counter=0
+      //   const next=()=>{
+      //     if(curIndex===total&&counter===0){
+      //       done()
+      //       return
+      //     }
+      //     while(curIndex<total && counter<concurrentNum){
+      //       const url=urls[curIndex]
+      //       curIndex++
+      //       counter++
+      //       mockFetch(url)
+      //       .then((res)=>callback(res))
+      //       .catch((err)=>{console.error(err)})
+      //       .finally(()=>{
+      //         counter--
+      //         next()
+      //       })
+      //     }
+      //   }
+      //   next()
+      // }
+      // requestLimiter(["a","b","c","aa","bb","cc","aaa","bbb","ccc"],2,(res)=>{console.log(res)},()=>{console.log("结束")})
+
+
+      // 写法2
+      // class requestLimiter{
+      //   constructor(concurrentNum = 2, callback, done){
+      //     this.concurrentNum=concurrentNum
+      //     this.callback=callback
+      //     this.done=done
+      //     this.counter=0
+      //     this.curIndex=0
+      //     this.urls=[]
+      //   }
+      //   start(urls = []){
+      //     this.urls=urls
+      //     this.doTask()
+      //   }
+      //   doTask(){
+      //     if(this.counter===0&&this.curIndex>=this.urls.length){
+      //       this.done()
+      //       return
+      //     }
+      //     while(this.counter<this.concurrentNum&&this.curIndex<this.urls.length){
+      //       const url=this.urls[this.curIndex]
+      //       this.counter++
+      //       this.curIndex++
+      //       mockFetch(url)
+      //       .then(()=>this.callback(url))
+      //       .catch((err)=>{console.error(err)})
+      //       .finally(()=>{
+      //         this.counter--
+      //         this.doTask()
+      //       })
+      //     }
+      //   }
+      // }
+      // const limiter= new requestLimiter(2,(res)=>{console.log(res)},()=>{console.log("结束")})
+      // limiter.start(["a","b","c","aa","bb","cc","aaa","bbb","ccc"])
+
+
+
+      // 写法3
+
+      // const mockTimeout = time =>
+			// 	new Promise(resolve => {
+			// 		setTimeout(resolve, time);
+			// 	});
+      // class requestLimiter{
+      //   constructor(concurrentNum = 2){
+      //     this.concurrentNum=concurrentNum
+      //     this.counter=0
+      //     this.tasks=[]
+      //   }
+      //   add(taskMaker){
+      //     this.tasks.push(taskMaker)
+      //     if(this.counter<this.concurrentNum){
+      //       this.counter++
+      //       this.doTask()
+      //     }
+      //   }
+      //   doTask(){
+      //     if(this.tasks.length>0){
+      //       const taskMaker=this.tasks.shift()
+      //       taskMaker()
+      //       .catch((err)=>{console.log(err)})
+      //       .finally(()=>{
+      //         this.counter--
+      //         this.doTask()
+      //       })
+      //     }
+
+
+      //   }
+      // }
+      // const scheduler = new requestLimiter()
+      // const addTask = (time, order) => {
+			// 	scheduler.add(() => mockTimeout(time).then(() => console.log(order)));
+			// };
+
+			// addTask(1000, '1');
+			// addTask(5000, '2');
+			// addTask(1400, '3');
+			// addTask(4300, '4');
+
+
+
+
+		</script>
+	</body>
+</html>

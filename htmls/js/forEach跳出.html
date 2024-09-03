@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="x-ua-compatible" content="IE=edge, chrome=1" />
+		<style></style>
+	</head>
+
+	<body>
+		<script>
+
+      // const callback=(ele, index)=>{
+      //   if(index==2){
+      //     return
+      //   }
+      // }
+      Array.prototype.myEach = function(callback) {
+          for (var i = 0; i < this.length; i++)
+              callback(this[i], i, this);
+      };
+      [1,2,3,4,5].forEach((ele, index)=>{
+        if(index===2)
+          // break
+          return
+      })
+
+		</script>
+	</body>
+</html>

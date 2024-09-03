@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple SPA</title>
+    <style>
+        #app {
+            padding: 20px;
+        }
+        nav a {
+            margin: 0 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="#/">Home</a>
+        <a href="#/about">About</a>
+        <a href="#/contact">Contact</a>
+    </nav>
+
+    <div id="app"></div>
+
+    <script>
+        class Router {
+            constructor() {
+                this.routes = {};
+                this.currentUrl = '';
+
+                this.refresh = this.refresh.bind(this);
+                window.addEventListener('load', this.refresh, false);
+                window.addEventListener('hashchange', this.refresh, false);
+            }
+
+            route(path, callback) {
+                this.routes[path] = callback || function() {};
+            }
+
+            refresh() {
+                this.currentUrl = location.hash.slice(1) || '/';
+                this.routes[this.currentUrl]();
+            }
+
+            push(path) {
+                location.hash = path;
+            }
+        }
+        // 实例化路由
+        window.miniRouter = new Router();
+        // 定义页面内容
+        function homePage() {
+            document.getElementById('app').innerHTML = `
+                <h1>Home Page</h1>
+                <p>Welcome to the Home page!</p>
+            `;
+        }
+        function aboutPage() {
+            document.getElementById('app').innerHTML = `
+                <h1>About Page</h1>
+                <p>This is the About page.</p>
+            `;
+        }
+        function contactPage() {
+            document.getElementById('app').innerHTML = `
+                <h1>Contact Page</h1>
+                <p>This is the Contact page.</p>
+            `;
+        }
+        // 注册路由
+        miniRouter.route('/', homePage);
+        miniRouter.route('/about', aboutPage);
+        miniRouter.route('/contact', contactPage);
+        // 手动导航
+        miniRouter.push('/'); // 加载首页
+    </script>
+
+</body>
+</html>

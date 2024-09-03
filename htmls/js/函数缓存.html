@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="x-ua-compatible" content="IE=edge, chrome=1" />
+		<title>debounce</title>
+		<style>
+			#container {
+				width: 100%;
+				height: 200px;
+				line-height: 200px;
+				text-align: center;
+				color: #fff;
+				background-color: #444;
+				font-size: 30px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<script>
+      var add = function (x,y) {
+          return x+y;
+      }
+			const memoize = function (func, content) {
+        debugger
+        let cache = Object.create(null)
+        content = content || this
+        return (...key) => {
+          if (!cache[key]) {
+            cache[key] = func.apply(content, key)
+          }
+          return cache[key]
+        }
+      }
+      const calc = memoize(add);
+      const num1 = calc(100,200)
+      const num2 = calc(100,200) // 缓存得到的结果
+		</script>
+	</body>
+</html>
